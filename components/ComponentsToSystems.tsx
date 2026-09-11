@@ -73,7 +73,7 @@ export default function ComponentsToSystems() {
       gsap.set(eyebrow, { yPercent: 130, opacity: 0 });
       gsap.set(titleLines, { yPercent: 105, opacity: 0 });
       gsap.set(sub, { y: 24, opacity: 0 });
-      gsap.set(cards, { y: 60, opacity: 0 });
+      gsap.set(cards, { yPercent: 30, opacity: 0, clipPath: "inset(0 100% 0 0)" });
 
       const tl = gsap.timeline({
         defaults: { ease: "power3.out" },
@@ -82,12 +82,20 @@ export default function ComponentsToSystems() {
       tl.to(eyebrow, { yPercent: 0, opacity: 1, duration: 0.55 })
         .to(titleLines, { yPercent: 0, opacity: 1, duration: 0.9, stagger: 0.08 }, "-=0.3")
         .to(sub, { y: 0, opacity: 1, duration: 0.65 }, "-=0.55")
-        .to(cards, { y: 0, opacity: 1, duration: 0.85, stagger: 0.1 }, "-=0.35");
+        .to(cards, {
+          yPercent: 0,
+          opacity: 1,
+          clipPath: "inset(0 0% 0 0)",
+          duration: 1.0,
+          stagger: 0.12,
+          ease: "power4.out",
+        }, "-=0.35");
 
       cards.forEach((card, i) => {
         const num = card.querySelector<HTMLElement>(".cts-card__num");
+        const inner = card.querySelector<HTMLElement>(".cts-card__inner");
         const paths = card.querySelectorAll<SVGPathElement | SVGCircleElement | SVGRectElement>(
-          ".cts-card__icon svg [pathlength], .cts-card__icon svg path[pathLength], .cts-card__icon svg circle[pathLength], .cts-card__icon svg rect[pathLength]"
+          ".cts-card__icon svg path[pathLength], .cts-card__icon svg circle[pathLength], .cts-card__icon svg rect[pathLength]"
         );
         const rule = card.querySelector<HTMLElement>(".cts-card__rule");
         const icon = card.querySelector<HTMLElement>(".cts-card__icon");
@@ -95,18 +103,20 @@ export default function ComponentsToSystems() {
         const brackets = card.querySelectorAll<HTMLElement>(".cts-card__bracket");
 
         gsap.set(paths, { strokeDasharray: 1, strokeDashoffset: 1 });
-        gsap.set(brackets, { scale: 0.6, opacity: 0 });
+        gsap.set(inner, { opacity: 0, y: 20 });
 
         const drawTl = gsap.timeline({
           scrollTrigger: { trigger: card, start: "top 80%", once: true },
-          delay: i * 0.1,
+          delay: i * 0.12,
         });
-        drawTl.to(paths, {
-          strokeDashoffset: 0,
-          duration: 1.1,
-          ease: "power2.inOut",
-          stagger: 0.06,
-        });
+        drawTl
+          .to(inner, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2)
+          .to(paths, {
+            strokeDashoffset: 0,
+            duration: 1.1,
+            ease: "power2.inOut",
+            stagger: 0.06,
+          }, 0.35);
 
         if (num) {
           const target = i + 1;

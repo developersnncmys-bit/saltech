@@ -5,9 +5,10 @@ export default function Footer() {
     <footer className="footer">
       <div className="footer__top">
         <div className="footer__brand">
-          <p className="footer__logo">
-            SAL<span>TECH</span>
-          </p>
+          <a href="#top" className="footer__logo-wrap" aria-label="Saltech home">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="Saltech" className="footer__logo-img" />
+          </a>
           <p className="footer__tag">
             UK-based engineering partner delivering safety-critical control and industrial systems.
           </p>
@@ -71,6 +72,16 @@ export default function Footer() {
       <div className="footer__bottom">
         <p className="footer__copy">
           Saltech Consulting Ltd | Registered in England &amp; Wales (Company No. 14906407) | Registered Office: 1 The Bluebells, Shaftesbury, SP7 8GW, United Kingdom.
+        </p>
+        <p className="footer__credit">
+          Developed by{" "}
+          <a
+            href="https://www.nakshatranamahacreations.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Nakshatra Namaha Creations
+          </a>
         </p>
       </div>
     </footer>

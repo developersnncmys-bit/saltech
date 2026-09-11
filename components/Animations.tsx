@@ -28,12 +28,18 @@ export default function Animations() {
            duplicate rAF
          - lagSmoothing(0) — disables GSAP's lag compensation so the
            smoothed scroll and the pin timelines stay in perfect sync */
+    // "Butter" mode. Long duration + gentle exponential ease-out
+    // creates the silky glide that feels continuous and smooth.
+    // The exponential curve means the scroll decelerates naturally
+    // over 1.6s instead of stopping abruptly, giving that "coasting"
+    // feel that reads as buttery.
     const lenis = new Lenis({
-      duration: 1.1,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      duration: 2.4,
+      easing: (t: number) => 1 - Math.pow(1 - t, 4),
       smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 1.4,
+      wheelMultiplier: 0.55,
+      touchMultiplier: 0.9,
+      syncTouch: true,
     });
     lenis.on("scroll", ScrollTrigger.update);
     const lenisTick = (time: number) => lenis.raf(time * 1000);
@@ -177,33 +183,21 @@ export default function Animations() {
       if (reframe) {
         gsap.set(".reframe__cosmic", { yPercent: 0 });
 
+        // Scroll-triggered wash — NO pin. As the section enters the
+        // viewport, the cosmic layer slides upward, revealing the
+        // white content half. Start when section top hits viewport
+        // bottom, complete by the time section top hits viewport top.
         gsap
           .timeline({
             defaults: { ease: "none" },
             scrollTrigger: {
               trigger: reframe,
-              start: "top top",
-              end: "+=120%",
-              pin: true,
-              pinSpacing: true,
-              anticipatePin: 1,
-              scrub: 1.8,
+              start: "top bottom",
+              end: "top top",
+              scrub: 0.6,
             },
           })
-          // Phase 1 (0 → 0.08) — very brief hold on the cosmic red
-          // before it starts sliding.
-          .to({}, { duration: 0.08 }, 0)
-          // Phase 2 (0.08 → 0.42) — the wash: cosmic yPercent 0 → -50,
-          // shifting the layer up by 100vh so the white content half
-          // is what's on screen.
-          .to(".reframe__cosmic", { yPercent: -50, ease: "power2.inOut", duration: 0.34 }, 0.08)
-          // Phase 3 (0.42 → 1.0) — HOLD on the revealed content. This
-          // is the "reading time" — the section stays pinned with all
-          // content visible for ~58% of the pin scroll (roughly a full
-          // viewport of scroll distance) before it releases into Cycle.
-          // Without this hold the text zips past because the pin ends
-          // as soon as the wash completes.
-          .to({}, { duration: 0.58 }, 0.42);
+          .to(".reframe__cosmic", { yPercent: -50, ease: "power2.inOut" }, 0);
       }
 
       // NOTE: Reframe ball/tile choreography DISABLED. Flip the `false &&`
@@ -211,7 +205,7 @@ export default function Animations() {
       // full HOLD → EXPAND → HOLD-RED → CONTRACT → HOLD-AT-CONTRACT pin.
       // If you re-enable the ball block, REMOVE the simple pin above
       // (this file will have two pins on `.reframe` otherwise).
-      if (false && reframe && button && orb && slot) {
+      if ((false as boolean) && reframe && button && orb && slot) {
         const title = reframe.querySelector<HTMLElement>(".reframe__title");
         const body = reframe.querySelector<HTMLElement>(".reframe__body");
         const eyebrow = reframe.querySelector<HTMLElement>(".reframe__eyebrow");
@@ -510,7 +504,7 @@ export default function Animations() {
       // NOTE: Cycle time-marker DISABLED together with the Reframe ball
       // choreography above. Flip the `false &&` back to just the original
       // guard to re-enable the ticking 06:00 → 02:00 scroll marker.
-      if (false && cycleMarker && cycleMarkerTime && cycleIntro && firstShift && lastShift) {
+      if ((false as boolean) && cycleMarker && cycleMarkerTime && cycleIntro && firstShift && lastShift) {
         // The shared .global-ball is sized to the REFRAME clamp (90-150px)
         // so the reframe pushbutton looks right. The old .cycle__marker-orb
         // was ~35% of that size (32-52px). To keep the cycle marker

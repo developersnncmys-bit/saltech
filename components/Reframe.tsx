@@ -17,8 +17,8 @@ export default function Reframe() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 className="reframe__img"
-                src="https://images.pexels.com/photos/2760241/pexels-photo-2760241.jpeg?auto=compress&cs=tinysrgb&w=800"
-                alt="Industrial control room mimic panel"
+                src="/images/hero-banner-section.png"
+                alt="Saltech engineered systems"
               />
               <h2 className="reframe__title">
                 <span className="reframe__title-soft">

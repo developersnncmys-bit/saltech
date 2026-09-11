@@ -73,9 +73,9 @@ export default function LegacyObsolete() {
             <p className="legacy__eyebrow">Legacy &amp; obsolete systems</p>
           </div>
           <h2 className="legacy__title">
-            <span className="legacy__title-clip"><span className="legacy__title-line">SUPPORTING</span></span>
-            <span className="legacy__title-clip"><span className="legacy__title-line">INSTALLATIONS THAT</span></span>
-            <span className="legacy__title-clip"><span className="legacy__title-line">NEED REPLACEMENT.</span></span>
+            <span className="legacy__title-clip"><span className="legacy__title-line">SUPPORTING INSTALLATIONS</span></span>
+            <span className="legacy__title-clip"><span className="legacy__title-line">THAT ARE OBSOLETE, DIFFICULT TO</span></span>
+            <span className="legacy__title-clip"><span className="legacy__title-line">SOURCE OR NEED REPLACEMENT.</span></span>
           </h2>
           <p className="legacy__body">
             A major part of what we do is supporting existing industrial
@@ -98,12 +98,11 @@ export default function LegacyObsolete() {
         <div className="legacy__media" aria-hidden="true">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://images.pexels.com/photos/2569842/pexels-photo-2569842.jpeg?auto=compress&cs=tinysrgb&w=1600"
+            src="/images/legacy.jpg"
             alt=""
             loading="lazy"
           />
           <span className="legacy__media-cover" aria-hidden="true" />
-          <span className="legacy__media-tag" aria-hidden="true">In service / 30+ yrs</span>
         </div>
       </div>
     </section>
