@@ -21,21 +21,16 @@ const shifts: Shift[] = [
     hueClass: "shift--dawn",
     pilot: "dawn",
     image: "https://images.pexels.com/photos/35072831/pexels-photo-35072831.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    cost: "The first 15 minutes of every shift — gone.",
-    title: "Shift start. First press of the day.",
+    cost: "Every plant starts the day at the mimic panel.",
+    title: "Shift start. The mimic panel comes alive.",
     body: (
       <>
-        Operators arrive to dead panels and cluttered HMIs, burning the first
-        fifteen minutes chasing screens instead of running machines.
+        Operators walk into the control room and read the entire plant off a
+        single mosaic mimic panel &mdash; process flows, alarm states and
+        active interlocks visible at a glance before the first HMI is opened.
       </>
     ),
-    answer: (
-      <>
-        Werner&rsquo;s <strong>Series&nbsp;40 illuminated pushbuttons</strong>{" "}
-        and 1&ndash;5 layer signal towers show the state of the operation from
-        across the yard &mdash; before a single keyboard is touched.
-      </>
-    ),
+    answer: <></>,
   },
   {
     id: "shift-12",
@@ -43,25 +38,16 @@ const shifts: Shift[] = [
     hueClass: "shift--noon",
     pilot: "green",
     image: "https://images.pexels.com/photos/2353937/pexels-photo-2353937.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    cost: "One failed button = a failed safety audit.",
-    title: "The button that decides your audit.",
+    cost: "Safety systems are only as good as their weakest device.",
+    title: "Peak operations. Safety systems on watch.",
     body: (
       <>
-        A cracked actuator, a mushy contact, a failed e-stop &mdash; any one
-        invalidates the whole sign-off. Cheap switches don&rsquo;t just break;
-        they cost you the audit.
+        Hazardous-area enclosures, ATEX / IECEx-certified control stations and
+        safety-instrumented systems keep protecting personnel and process while
+        the plant runs at full load through the busiest hours of the day.
       </>
     ),
-    answer: (
-      <>
-        Werner&rsquo;s{" "}
-        <strong>
-          Series&nbsp;41 gold-plated contacts, certified for Seismic&nbsp;zone&nbsp;3
-        </strong>
-        , pass the audit on the first try. The button still feels right in year
-        ten.
-      </>
-    ),
+    answer: <></>,
   },
   {
     id: "shift-18",
@@ -69,22 +55,16 @@ const shifts: Shift[] = [
     hueClass: "shift--evening",
     pilot: "amber",
     image: "https://images.pexels.com/photos/29224569/pexels-photo-29224569.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    cost: "One inconsistent pendant = a load in the air.",
-    title: "Shift change with a live crane.",
+    cost: "A handover should never mean a loss of context.",
+    title: "Shift change. Consoles reconfigure for the next crew.",
     body: (
       <>
-        One team hands off a live crane. The incoming operator&rsquo;s pendant
-        feels different, keys respond differently &mdash; and now there&rsquo;s
-        a load in the air and a conversation on the floor.
+        Operator workstations, consoles and indication systems present the
+        same information the same way, shift after shift &mdash; so handovers
+        are complete, auditable and take minutes, not hours.
       </>
     ),
-    answer: (
-      <>
-        Werner&rsquo;s <strong>remote pendants with up to 12 keys</strong>,
-        single or dual-speed, keep tactile response identical shift after shift.
-        Handovers happen mid-motion, not mid-argument.
-      </>
-    ),
+    answer: <></>,
   },
   {
     id: "shift-22",
@@ -92,22 +72,16 @@ const shifts: Shift[] = [
     hueClass: "shift--night",
     pilot: "red",
     image: "https://images.pexels.com/photos/11783119/pexels-photo-11783119.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    cost: "Seconds of missed alarm = hours of downtime.",
-    title: "The night crew reads the panel from across the yard.",
+    cost: "At night, seconds of missed instrumentation cost hours of downtime.",
+    title: "Night operations. Instrumentation surfaces every deviation.",
     body: (
       <>
-        Faults buried five screens deep cost seconds &mdash; and at 2am, seconds
-        cost shutdowns. Operators can&rsquo;t react to what they can&rsquo;t
-        see.
+        Process instrumentation, field devices and annunciator windows push
+        every deviation to the mimic and to the operator in real time &mdash;
+        so the night crew reacts to conditions, not screen dives.
       </>
     ),
-    answer: (
-      <>
-        Werner&rsquo;s <strong>Series&nbsp;32 Jumbo Dome pilot lights</strong>{" "}
-        (ø66 mm lens) and 200-window annunciators surface every deviation the
-        instant it happens. Nothing waits its turn.
-      </>
-    ),
+    answer: <></>,
   },
   {
     id: "shift-02",
@@ -115,24 +89,16 @@ const shifts: Shift[] = [
     hueClass: "shift--deep",
     pilot: "moon",
     image: "https://images.pexels.com/photos/3582392/pexels-photo-3582392.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    cost: "The 100,000th press has to feel like the first.",
-    title: "From first start to final stop.",
+    cost: "Assets have to perform for decades, not just for commissioning day.",
+    title: "Long into the night. Long into the asset&rsquo;s life.",
     body: (
       <>
-        Werner stays within reach through every stage of the operation.
+        Specialist mechanical packages, rotary equipment and lifecycle support
+        keep the same systems dependable years after handover &mdash; asset
+        owners, EPCs and integrators supported for the long haul.
       </>
     ),
-    answer: (
-      <>
-        Werner&rsquo;s{" "}
-        <strong>
-          Series&nbsp;45 unibody pushbuttons &mdash; 100,000&nbsp;operations
-          guaranteed
-        </strong>
-        , plus mosaic control-room panels that reconfigure without downtime. The
-        last press of the day feels like the first press of the shift.
-      </>
-    ),
+    answer: <></>,
   },
 ];
 
@@ -211,11 +177,12 @@ export default function Cycle() {
         <div className="cycle__intro-row">
           <div className="cycle__aside">
             <p className="cycle__lede">
-              One switch. Five shift moments. Every operator input reads right
-              &mdash; from the first coffee to the 2am handover.
+              A day inside a Saltech-equipped control room &mdash; from the
+              first mimic-panel walk-through to the 2am asset that just keeps
+              running.
             </p>
           </div>
-          <h2 className="cycle__heading">Your shift day with Werner.</h2>
+          <h2 className="cycle__heading">A day in a safety-critical plant.</h2>
         </div>
       </div>
 
@@ -238,7 +205,7 @@ export default function Cycle() {
               <h3 className="shift__title">{s.title}</h3>
               <p className="shift__body">{s.body}</p>
               {/* <p className="shift__answer">
-                <span className="shift__answer-label">Werner&rsquo;s fix &rarr;</span>
+                <span className="shift__answer-label">Saltech&rsquo;s fix &rarr;</span>
                 {s.answer}
               </p> */}
             </div>

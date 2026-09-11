@@ -80,8 +80,8 @@ const MODEL_TARGET_SIZE = 2.6;
 // Compressed timeline — every scroll segment produces a visible change,
 // no long stretches of empty black space.
 const SCROLL_DISTANCE_PX = 3200;
-const SECTION_SELECTOR = ".werner-cinematic-section";
-const MODEL_URL = "/models/werner-switch.gltf";
+const SECTION_SELECTOR = ".saltech-cinematic-section";
+const MODEL_URL = "/models/saltech-switch.gltf";
 
 // =============================================================================
 
@@ -311,12 +311,12 @@ function RearAccentLight({ progressRef }: { progressRef: MutableRefObject<number
   const ref = useRef<THREE.DirectionalLight>(null);
   useFrame(() => {
     if (!ref.current) return;
-    // Warm accent for copper/orange internals — reads with Werner's amber.
+    // Warm accent for copper/orange internals — reads with Saltech's amber.
     // Starts earlier (0.32) for the side-rotation reveal, holds strong
     // through engineering (0.82).
     ref.current.intensity = lerp(0.60, 3.0, rampIn(progressRef.current, 0.32, 0.72));
   });
-  return <directionalLight ref={ref} position={[0.8, 2.2, -6]} intensity={0.60} color="#ffcf9a" />;
+  return <directionalLight ref={ref} position={[0.8, 2.2, -6]} intensity={0.60} color="#FFB8B0" />;
 }
 
 export default function SwitchShowcase() {
@@ -336,9 +336,9 @@ export default function SwitchShowcase() {
     const caption  = section.querySelector<HTMLElement>(".features__caption");
     // Rear-text children animate INDIVIDUALLY (staggered editorial entrance):
     // ENGINEERED → heading → paragraph
-    const rearEyebrow = section.querySelector<HTMLElement>(".werner-cinematic-rear-text__eyebrow");
-    const rearTitle   = section.querySelector<HTMLElement>(".werner-cinematic-rear-text__title");
-    const rearBody    = section.querySelector<HTMLElement>(".werner-cinematic-rear-text__body");
+    const rearEyebrow = section.querySelector<HTMLElement>(".saltech-cinematic-rear-text__eyebrow");
+    const rearTitle   = section.querySelector<HTMLElement>(".saltech-cinematic-rear-text__title");
+    const rearBody    = section.querySelector<HTMLElement>(".saltech-cinematic-rear-text__body");
     const rearChildren: (HTMLElement | null)[] = [rearEyebrow, rearTitle, rearBody];
 
     // Explicit progress-0 text state
@@ -422,8 +422,8 @@ export default function SwitchShowcase() {
     // section — the experience should feel cinematic, not like a 3D viewer.
     // Uses a body class so the CSS rule can target the cursor elements
     // (they're appended to <body> outside this component's DOM subtree).
-    const onEnter = () => document.body.classList.add("werner-cinematic-hover");
-    const onLeave = () => document.body.classList.remove("werner-cinematic-hover");
+    const onEnter = () => document.body.classList.add("saltech-cinematic-hover");
+    const onLeave = () => document.body.classList.remove("saltech-cinematic-hover");
     section.addEventListener("mouseenter", onEnter);
     section.addEventListener("mouseleave", onLeave);
 
@@ -432,7 +432,7 @@ export default function SwitchShowcase() {
       stRef.current = null;
       section.removeEventListener("mouseenter", onEnter);
       section.removeEventListener("mouseleave", onLeave);
-      document.body.classList.remove("werner-cinematic-hover");
+      document.body.classList.remove("saltech-cinematic-hover");
     };
   }, []);
 

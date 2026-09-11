@@ -18,7 +18,7 @@ export default function GlobalSection() {
             <a href="https://wa.me/919538492009" className="btn btn--light">
               WhatsApp us
             </a>
-            <a href="mailto:info@wernerelektrik.com" className="global__link">
+            <a href="mailto:info@saltech.com" className="global__link">
               Send an enquiry &rarr;
             </a>
           </div>
@@ -52,7 +52,7 @@ export default function GlobalSection() {
               <p className="office__country">India &mdash; Head Office</p>
             </header>
             <p className="office__addr">
-              Werner Electric Private Limited, #278/C, Hebbal Industrial Area, Mysore 570018, India
+              Saltech Private Limited, #278/C, Hebbal Industrial Area, Mysore 570018, India
             </p>
             <dl className="office__meta">
               <div>
@@ -64,7 +64,7 @@ export default function GlobalSection() {
               <div>
                 <dt>Email</dt>
                 <dd>
-                  <a href="mailto:info@wernerelektrik.com">info@wernerelektrik.com</a>
+                  <a href="mailto:info@saltech.com">info@saltech.com</a>
                 </dd>
               </div>
               <div>
@@ -105,7 +105,7 @@ export default function GlobalSection() {
               <div>
                 <dt>Email</dt>
                 <dd>
-                  <a href="mailto:info@wernerelektrik.com">info@wernerelektrik.com</a>
+                  <a href="mailto:info@saltech.com">info@saltech.com</a>
                 </dd>
               </div>
               <div>

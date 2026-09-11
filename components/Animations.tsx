@@ -52,28 +52,45 @@ export default function Animations() {
         nav?.classList.toggle("nav--on-light", on);
 
       /* -------------------------------------------------- HERO
-         Two-phase pinned intro (HEAVN One style):
-         Phase 1 (0.00 → 0.50) — image zooms hard, wordmark + side-1 fade out,
-                                 centered brand statement fades in
-         Phase 2 (0.50 → 1.00) — hold on the zoomed-in state so the next
-                                 scroll tick unpins and reveals Reframe */
+         Two-phase pinned intro (V2 — Sept 2026):
+         Phase 0 (initial view) — only eyebrow + headline visible; the
+                                  sub-body, credibility bullets, and CTA row
+                                  are pre-hidden by gsap.set below.
+         Phase 1 (on scroll)   — background image zooms slightly + the three
+                                  hidden blocks fade+rise in as a stagger.
+                                  Eyebrow + headline stay in place; nothing
+                                  is faded OUT. */
       const hero = document.querySelector(".hero");
       if (hero) {
-        // Explicit initial state for the phase-2 statement so autoAlpha
-        // race with CSS doesn't leave it hidden on hot reload
-        gsap.set(".hero__statement", { opacity: 0, y: 40 });
+        // Pre-hide the three second-phase blocks. gsap.set applies inline
+        // styles synchronously on mount so there is no FOUC. When
+        // prefers-reduced-motion is true we hit the early return above and
+        // these never run — meaning reduced-motion users see everything
+        // without needing to scroll. Correct fallback behaviour.
+        gsap.set(".hero__sub-body", { opacity: 0, y: 30 });
+        gsap.set(".hero__credibility", { opacity: 0, y: 24 });
+        gsap.set(".hero__cta-row", { opacity: 0, y: 24 });
+        // Phase-0 offset — shifts the whole wordmark down by ~22% of its
+        // own height so eyebrow + title sit at viewport centre even though
+        // the (invisible) reveal blocks below still take flex space. On
+        // scroll this animates back to 0 so phase-1 content lands where
+        // its natural flow layout expects it.
+        gsap.set(".hero__wordmark", { yPercent: 22 });
 
-        // Entry
+        // Entry — fade the eyebrow + title in on page load.
+        // Image intentionally NOT animated here: any .from() on it would
+        // set an initial scale synchronously, which the scrub timeline
+        // below would then capture as its own start value, permanently
+        // zooming the image. The scrub does the entire image zoom.
         const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
         intro
-          .from(".hero__img", { scale: 1.08, duration: 0.9, ease: "power2.out" })
-          .from(".hero__eyebrow", { y: 14, opacity: 0, duration: 0.35 }, "-=0.7")
-          .from(".hero__title", { y: 40, opacity: 0, duration: 0.6 }, "-=0.3")
-          .from(".hero__side-1", { y: 12, opacity: 0, duration: 0.4 }, "-=0.4");
+          .from(".hero__eyebrow", { y: 14, opacity: 0, duration: 0.35 })
+          .from(".hero__title", { y: 40, opacity: 0, duration: 0.6 }, "-=0.15");
 
-        // Pinned scrub timeline — single-phase: image zoom + text swap
-        // happen together over one scroll gesture, then pin releases
-        // straight into the next section (no hold)
+        // Pinned scrub timeline. As the user scrolls through the pinned
+        // hero, the background image zooms and the three hidden blocks
+        // reveal in sequence (sub-body → credibility → CTA row). The
+        // eyebrow + headline are NOT touched — they stay put.
         gsap.timeline({
           defaults: { ease: "none" },
           scrollTrigger: {
@@ -85,9 +102,49 @@ export default function Animations() {
             anticipatePin: 1,
           },
         })
-          .to(".hero__img", { scale: 1.5, ease: "power1.inOut", duration: 1 }, 0)
-          .to(".hero__wordmark", { opacity: 0, y: -60, ease: "power2.in", duration: 0.5 }, 0)
-          .to(".hero__statement", { opacity: 1, y: 0, ease: "power2.out", duration: 0.6 }, 0.4);
+          // Image scales through the whole scrub — subtle background motion
+          // keeps giving scroll feedback even during the phase-0 hold.
+          // fromTo (explicit scale: 1 start) so the scrub doesn't inherit
+          // any transient scale value from earlier in the boot sequence.
+          .fromTo(".hero__img",
+            { scale: 1 },
+            { scale: 1.15, ease: "power1.inOut", duration: 1 },
+            0
+          )
+          // Phase-0 HOLD (scroll 0 → ~30% of pin): nothing touches the
+          // wordmark; eyebrow + title stay fully visible at viewport centre.
+          // Phase-0 → phase-1 TRANSITION begins at timeline position 0.30.
+          // In phase 1, shift the wordmark UP by ~22% of its own height so
+          // the visible sub-body + credibility + CTA group is centred in the
+          // viewport (the invisible eyebrow+title above still take flex
+          // space and would otherwise push the visible block low).
+          .to(".hero__wordmark", { yPercent: -22, ease: "power2.out", duration: 0.35 }, 0.30)
+          // Eyebrow + title fade + lift out during the transition.
+          // Explicit fromTo so the scrub can't inherit opacity 0 from the
+          // intro's .from() (which was making them invisible on phase 0).
+          .fromTo(".hero__eyebrow",
+            { opacity: 1, y: 0 },
+            { opacity: 0, y: -14, ease: "power2.in", duration: 0.25 },
+            0.30
+          )
+          .fromTo(".hero__title",
+            { opacity: 1, y: 0 },
+            { opacity: 0, y: -32, ease: "power2.in", duration: 0.30 },
+            0.30
+          )
+          // Sub-body — the new phase-1 anchor. Crossfades in while the
+          // headline dissolves, scaling up ~35% so it reads as a mid-size
+          // headline (bigger than body copy, smaller than the H1).
+          .to(".hero__sub-body", {
+            opacity: 1, y: 0,
+            scale: 1.6,
+            transformOrigin: "center center",
+            color: "#ffffff",
+            fontWeight: 700,
+            ease: "power2.out", duration: 0.35,
+          }, 0.35)
+          .to(".hero__credibility", { opacity: 1, y: 0, ease: "power2.out", duration: 0.3 }, 0.65)
+          .to(".hero__cta-row", { opacity: 1, y: 0, ease: "power2.out", duration: 0.3 }, 0.80);
       }
 
       /* -------------------------------------------------- REFRAME
@@ -96,7 +153,7 @@ export default function Animations() {
          (2) EXPAND  · red cap scales ~40x to fill the viewport as a red wash
          (3) HOLD-RED· brief dwell on the pure red field
          (4) CONTRACT· red shrinks back to product size AND bezel + highlight
-                       + WERNER mark fade in — becomes a physical switch
+                       + SALTECH mark fade in — becomes a physical switch
          (5) DESCEND · switch translates downward, off-screen into next section
 
          The button is a SIBLING of the H2 (not a child) so the H2 fade
@@ -107,7 +164,54 @@ export default function Animations() {
       const button = document.querySelector<HTMLElement>(".global-ball");
       const orb = button?.querySelector<HTMLElement>(".global-ball-orb");
       const slot = reframe?.querySelector<HTMLElement>(".reframe__slot");
-      if (reframe && button && orb && slot) {
+
+      // Section pins to viewport top. The cosmic layer (200vh tall,
+      // half red space + half white with content baked in) slides
+      // upward by 50% of its own height during the pin — which is
+      // exactly one viewport. That swaps the visible half from the
+      // red top to the white bottom, and the content sitting in the
+      // white bottom rises INTO view along with it. Because the
+      // content is INSIDE the cosmic layer, the transition between
+      // "white part of gradient" and "white with content" is one
+      // continuous element — no seam, no separate fade.
+      if (reframe) {
+        gsap.set(".reframe__cosmic", { yPercent: 0 });
+
+        gsap
+          .timeline({
+            defaults: { ease: "none" },
+            scrollTrigger: {
+              trigger: reframe,
+              start: "top top",
+              end: "+=120%",
+              pin: true,
+              pinSpacing: true,
+              anticipatePin: 1,
+              scrub: 1.8,
+            },
+          })
+          // Phase 1 (0 → 0.08) — very brief hold on the cosmic red
+          // before it starts sliding.
+          .to({}, { duration: 0.08 }, 0)
+          // Phase 2 (0.08 → 0.42) — the wash: cosmic yPercent 0 → -50,
+          // shifting the layer up by 100vh so the white content half
+          // is what's on screen.
+          .to(".reframe__cosmic", { yPercent: -50, ease: "power2.inOut", duration: 0.34 }, 0.08)
+          // Phase 3 (0.42 → 1.0) — HOLD on the revealed content. This
+          // is the "reading time" — the section stays pinned with all
+          // content visible for ~58% of the pin scroll (roughly a full
+          // viewport of scroll distance) before it releases into Cycle.
+          // Without this hold the text zips past because the pin ends
+          // as soon as the wash completes.
+          .to({}, { duration: 0.58 }, 0.42);
+      }
+
+      // NOTE: Reframe ball/tile choreography DISABLED. Flip the `false &&`
+      // back to just `reframe && button && orb && slot` to re-enable the
+      // full HOLD → EXPAND → HOLD-RED → CONTRACT → HOLD-AT-CONTRACT pin.
+      // If you re-enable the ball block, REMOVE the simple pin above
+      // (this file will have two pins on `.reframe` otherwise).
+      if (false && reframe && button && orb && slot) {
         const title = reframe.querySelector<HTMLElement>(".reframe__title");
         const body = reframe.querySelector<HTMLElement>(".reframe__body");
         const eyebrow = reframe.querySelector<HTMLElement>(".reframe__eyebrow");
@@ -119,7 +223,7 @@ export default function Animations() {
         // an awkward empty gap before pin engages). GSAP animates the
         // slot's width open at pin start and closed again at EXPAND.
         const expectedSlotWidth = () =>
-          Math.max(90, Math.min((9 * window.innerWidth) / 100, 150));
+          Math.max(56, Math.min((5 * window.innerWidth) / 100, 80));
 
         // Ball position: measure the slot at its TARGET (expanded)
         // width, not its current width. Because the H2 is text-align:
@@ -173,7 +277,7 @@ export default function Animations() {
             scale: 1,
           });
         };
-        // Initial state: bezel/highlight/WERNER-mark start invisible
+        // Initial state: bezel/highlight/SALTECH-mark start invisible
         // — they only fade in during the CONTRACT phase of the pin
         // timeline. onEnter/onEnterBack now use pinTl.progress() to
         // force the timeline to re-sync on re-entry, so no manual
@@ -258,12 +362,13 @@ export default function Animations() {
               // which start from these matching values, so no visible
               // transition.
               placeButtonOnce();
+              const dx = parseFloat(button.dataset.dx || "0");
               const dy = parseFloat(button.dataset.dy || "0");
               gsap.set(button, {
                 autoAlpha: 1,
-                scale: 0.42,
-                x: 0,
-                y: dy + window.innerHeight * 0.42,
+                scale: 1.2,
+                x: dx,
+                y: dy + window.innerHeight * 0.22,
               });
               gsap.set([bezel, highlight, mark], { opacity: 1 });
               slot.classList.add("is-taken");
@@ -306,14 +411,14 @@ export default function Animations() {
         );
         pinTl.to({}, { duration: 0.04 });
 
-        // (2) EXPAND  0.06 → 0.20 : text turns WHITE (stays visible on the
-        //     red wash), ball scales to fill viewport AND moves y toward
-        //     viewport center so the red wash is centered — and so contract
-        //     can continue smoothly downward from that position without
-        //     teleporting the ball.
-        pinTl.to(title, { color: "#ffffff", duration: 0.10, ease: "power1.inOut" }, 0.06);
-        pinTl.to(body, { color: "rgba(255,255,255,0.85)", duration: 0.10, ease: "power1.inOut" }, 0.06);
-        pinTl.to(eyebrow, { color: "rgba(255,255,255,0.85)", duration: 0.10, ease: "power1.inOut" }, 0.06);
+        // (2) EXPAND  0.06 → 0.20 : text turns DARK (stays visible on the
+        //     amber wash which now fills a cosmic-dark bg — white text
+        //     would be invisible on the amber, so we invert to a deep
+        //     brown/black), ball scales to fill viewport AND moves y
+        //     toward viewport center so the wash is centered.
+        pinTl.to(title, { color: "#1a1006", duration: 0.10, ease: "power1.inOut" }, 0.06);
+        pinTl.to(body, { color: "rgba(26,16,6,0.82)", duration: 0.10, ease: "power1.inOut" }, 0.06);
+        pinTl.to(eyebrow, { color: "rgba(26,16,6,0.82)", duration: 0.10, ease: "power1.inOut" }, 0.06);
         pinTl.to(slot, { width: 0, duration: 0.10, ease: "power1.inOut" }, 0.06);
         pinTl.to(
           button,
@@ -329,22 +434,23 @@ export default function Animations() {
         // (3) HOLD-RED  0.20 → 0.28 : pure red wash briefly
         pinTl.to({}, { duration: 0.08 });
 
-        // (4) CONTRACT  0.28 → 0.42 : ball shrinks small and moves BELOW
-        //     the text at horizontal center; text stays visible with color
-        //     restored to black. Bezel + highlight + mark reveal on the ball.
-        //     Position is pushed to ~92% viewport (below body paragraph,
-        //     between body & eyebrow) and scale is small so the physical
-        //     switch is visibly its own element and never overlaps text.
-        pinTl.to(title, { color: "#0a0a0a", duration: 0.10, ease: "power1.inOut" }, 0.28);
-        pinTl.to(body, { color: "rgba(20,20,20,0.7)", duration: 0.10, ease: "power1.inOut" }, 0.28);
-        pinTl.to(eyebrow, { color: "rgba(20,20,20,0.7)", duration: 0.10, ease: "power1.inOut" }, 0.28);
+        // (4) CONTRACT  0.28 → 0.42 : ball shrinks to a legible tile
+        //     size and moves BELOW the text at horizontal center; text
+        //     stays visible with color restored to black. Bezel +
+        //     highlight + mark reveal on the ball. Scale is 1.2 so the
+        //     tile is a properly-visible mosaic mimic tile with its
+        //     panel photo, metal frame and tag ID all readable —
+        //     rather than a tiny illegible dot.
+        pinTl.to(title, { color: "#ffffff", duration: 0.10, ease: "power1.inOut" }, 0.28);
+        pinTl.to(body, { color: "rgba(255,255,255,0.78)", duration: 0.10, ease: "power1.inOut" }, 0.28);
+        pinTl.to(eyebrow, { color: "rgba(255,255,255,0.7)", duration: 0.10, ease: "power1.inOut" }, 0.28);
         pinTl.to(
           button,
           {
-            scale: 0.42,
+            scale: 1.2,
             x: () => parseFloat(button.dataset.dx || "0"),
             y: () =>
-              parseFloat(button.dataset.dy || "0") + window.innerHeight * 0.42,
+              parseFloat(button.dataset.dy || "0") + window.innerHeight * 0.22,
             ease: "power2.inOut",
             duration: 0.14,
           },
@@ -401,7 +507,10 @@ export default function Animations() {
       const firstShift = shiftEls[0];
       const lastShift = shiftEls[shiftEls.length - 1];
 
-      if (cycleMarker && cycleMarkerTime && cycleIntro && firstShift && lastShift) {
+      // NOTE: Cycle time-marker DISABLED together with the Reframe ball
+      // choreography above. Flip the `false &&` back to just the original
+      // guard to re-enable the ticking 06:00 → 02:00 scroll marker.
+      if (false && cycleMarker && cycleMarkerTime && cycleIntro && firstShift && lastShift) {
         // The shared .global-ball is sized to the REFRAME clamp (90-150px)
         // so the reframe pushbutton looks right. The old .cycle__marker-orb
         // was ~35% of that size (32-52px). To keep the cycle marker
@@ -409,7 +518,7 @@ export default function Animations() {
         // Old: scale 0.85 on 52px orb ≈ 44px displayed
         // New: scale 0.29 on 150px ball ≈ 44px displayed → same on-screen size
         // Keeps the SAME physical-button appearance the reframe pin left
-        // us with (CONTRACT scale 0.42, bezel+highlight+WERNER mark
+        // us with (CONTRACT scale 0.42, bezel+highlight+SALTECH mark
         // visible). Entry matches CONTRACT exactly so the handoff is
         // seamless. Base is larger so the parked button reads clearly
         // next to the time label.
@@ -440,7 +549,7 @@ export default function Animations() {
           })
           // Entry — SMOOTHLY animate from wherever the reframe pin left
           // the ball (CONTRACT state: below description at ~92vh viewport,
-          // scale 0.42, with bezel + highlight + WERNER mark visible) to
+          // scale 0.42, with bezel + highlight + SALTECH mark visible) to
           // the cycle marker position at 78vh. Keeps the same physical
           // button appearance — bezel + highlight + mark stay visible so
           // it's clearly the same button flowing down from reframe, NOT
@@ -691,6 +800,108 @@ export default function Animations() {
             // viewport (nearly finished passing). Linear between.
             const startY = vh * 0.8;
             const endY = vh * 0.4;
+            const totalTravel = (startY - endY) + rect.height;
+            const traveled = startY - rect.top;
+            paint(traveled / totalTravel);
+          };
+          compute();
+          let ticking = false;
+          const onScroll = () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => {
+              compute();
+              ticking = false;
+            });
+          };
+          window.addEventListener("scroll", onScroll, { passive: true });
+          window.addEventListener("resize", compute);
+        }
+      }
+
+      /* -------------------------------------------------- SOLUTIONS — per-scene entry + image parallax
+         Each full-viewport .sol-scene:
+           - text stagger (title → body → cta) fades up when the scene
+             enters the viewport (one-shot, not scrubbed)
+           - image scrubs a slow scale+translate as the scene passes
+             through, giving a subtle parallax/depth feel                */
+      gsap.utils.toArray<HTMLElement>(".sol-scene").forEach((scene) => {
+        const media = scene.querySelector<HTMLElement>(".sol-scene__media img");
+        const title = scene.querySelector<HTMLElement>(".sol-scene__title");
+        const body = scene.querySelector<HTMLElement>(".sol-scene__body");
+        const cta = scene.querySelector<HTMLElement>(".sol-scene__cta");
+
+        const textTargets = [title, body, cta].filter(
+          (el): el is HTMLElement => !!el
+        );
+        if (textTargets.length) {
+          gsap.set(textTargets, { y: 40, opacity: 0 });
+          gsap.to(textTargets, {
+            y: 0,
+            opacity: 1,
+            duration: 0.9,
+            ease: "power3.out",
+            stagger: 0.14,
+            scrollTrigger: {
+              trigger: scene,
+              start: "top 65%",
+              once: true,
+            },
+          });
+        }
+
+        if (media) {
+          gsap.fromTo(
+            media,
+            { scale: 1.12, yPercent: -4 },
+            {
+              scale: 1,
+              yPercent: 4,
+              ease: "none",
+              scrollTrigger: {
+                trigger: scene,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 0.8,
+              },
+            }
+          );
+        }
+      });
+
+      /* Solutions section is white — flip nav to dark-text while active */
+      const solutions = document.querySelector<HTMLElement>(".solutions");
+      if (solutions) {
+        ScrollTrigger.create({
+          trigger: solutions,
+          start: "top 80px",
+          end: "bottom 80px",
+          onToggle: (self) => setNavLight(self.isActive),
+        });
+      }
+
+      /* -------------------------------------------------- FINAL CTA — word-by-word scrub reveal */
+      const finalText = document.querySelector<HTMLElement>(".final__text");
+      if (finalText) {
+        const words = Array.from(
+          finalText.querySelectorAll<HTMLElement>(".final__word")
+        );
+        if (words.length > 0) {
+          const paint = (progress: number) => {
+            const p = Math.max(0, Math.min(1, progress));
+            const revealed = Math.round(p * words.length);
+            for (let i = 0; i < words.length; i++) {
+              const on = i < revealed;
+              if ((words[i].dataset.revealed === "true") !== on) {
+                words[i].dataset.revealed = on ? "true" : "false";
+              }
+            }
+          };
+          const compute = () => {
+            const rect = finalText.getBoundingClientRect();
+            const vh = window.innerHeight;
+            const startY = vh * 0.85;
+            const endY = vh * 0.35;
             const totalTravel = (startY - endY) + rect.height;
             const traveled = startY - rect.top;
             paint(traveled / totalTravel);

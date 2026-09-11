@@ -1,17 +1,19 @@
 import Animations from "@/components/Animations";
-import Clients from "@/components/Clients";
-import Cycle from "@/components/Cycle";
-import FeatureGrid from "@/components/FeatureGrid";
+import ComponentsToSystems from "@/components/ComponentsToSystems";
+import Credibility from "@/components/Credibility";
+import EngineeringUnderOneRoof from "@/components/EngineeringUnderOneRoof";
 import FinalCTA from "@/components/FinalCTA";
 import Footer from "@/components/Footer";
 import GlobalBall from "@/components/GlobalBall";
 import Hero from "@/components/Hero";
+import Industries from "@/components/Industries";
+import LegacyObsolete from "@/components/LegacyObsolete";
+import ManufacturingEngineering from "@/components/ManufacturingEngineering";
 import Nav from "@/components/Nav";
 import Preloader from "@/components/Preloader";
-import Quote from "@/components/Quote";
 import Reframe from "@/components/Reframe";
-import TechDetails from "@/components/TechDetails";
-import Trial from "@/components/Trial";
+import Solutions from "@/components/Solutions";
+import WhySaltech from "@/components/WhySaltech";
 
 export default function Page() {
   return (
@@ -20,12 +22,14 @@ export default function Page() {
       <Nav />
       <Hero />
       <Reframe />
-      <Cycle />
-      <FeatureGrid />
-      <Trial />
-      <Clients />
-      <Quote />
-      <TechDetails />
+      <Solutions />
+      <ComponentsToSystems />
+      <LegacyObsolete />
+      <EngineeringUnderOneRoof />
+      <WhySaltech />
+      <Industries />
+      <ManufacturingEngineering />
+      <Credibility />
       <FinalCTA />
       <Footer />
       <GlobalBall />

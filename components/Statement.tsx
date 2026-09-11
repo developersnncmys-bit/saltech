@@ -11,7 +11,7 @@ export default function Statement() {
         </h2>
 
         <p className="statement__body">
-          Werner Electric builds the human-facing layer of industrial control &mdash;
+          Saltech builds the human-facing layer of industrial control &mdash;
           pilot lights, vandal-proof metal switches, annunciators, remote pendants and hardwired
           mosaic panels. Every product engineered for a million cycles, refined by senior mechanical
           designers on real shop floors across India and Turkey.

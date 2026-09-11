@@ -53,11 +53,11 @@ export default function Clients() {
         <div className="clients__head">
           <p className="clients__label">
             <span className="clients__label-mark" aria-hidden="true" />
-            Clients
+            Partners
           </p>
           <h2 className="clients__heading">
-            Trusted by industry leaders across India, Turkey and beyond &mdash; from panel
-            builders to full-scale plant integrators.
+            Our technology &amp; manufacturing partners &mdash; approved to
+            ensure certified, long-term supportable solutions.
           </h2>
         </div>
       </div>

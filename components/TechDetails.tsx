@@ -10,63 +10,63 @@ type Row = {
 
 const rows: Row[] = [
   {
-    label: "Series 32 &mdash; Jumbo Dome pilot lights",
-    series: "Ø22 mm",
+    label: "Control room systems",
+    series: "Mimic &amp; consoles",
     specs: [
-      ["Lens diameter", "Ø66 mm"],
-      ["Mounting", "Ø22 mm hole"],
-      ["Illumination", "LED, high brightness"],
-      ["Application", "Visible from across the yard"],
+      ["Mosaic mimic panels", "Custom-engineered plant overviews"],
+      ["Operator workstations", "Multi-screen consoles &amp; desks"],
+      ["Indication systems", "Alarm windows, annunciators, interlocks"],
+      ["Delivery", "Design, manufacture, factory acceptance"],
     ],
   },
   {
-    label: "Series 40 &mdash; Illuminated pushbuttons",
-    series: "16 mm",
+    label: "Hazardous area &amp; safety",
+    series: "ATEX / IECEx",
     specs: [
-      ["Mounting", "16 mm"],
-      ["IP rating", "IP40 / IP65"],
-      ["Contacts", "SPDT / DPDT, gold-plated"],
-      ["Variants", "Illuminated E-stop available"],
+      ["Enclosures", "Ex-rated junction boxes, control stations"],
+      ["Certification", "ATEX &amp; IECEx, Zone 1 / Zone 2"],
+      ["Application", "Safety-instrumented systems (SIS)"],
+      ["Documentation", "Full traceability &amp; test certificates"],
     ],
   },
   {
-    label: "Series 41 &mdash; Compact multi-contact",
-    series: "16 mm",
+    label: "Process instrumentation",
+    series: "Field &amp; panel",
     specs: [
-      ["Mounting", "16 mm"],
-      ["IP rating", "IP40 / IP65"],
-      ["Contacts", "1NO+1NC up to 5NO+5NC"],
-      ["Certification", "Seismic zone 3"],
+      ["Field devices", "Pressure, temperature, level, flow"],
+      ["Panel indication", "Digital &amp; analog indicators"],
+      ["Integration", "Specified &amp; integrated to plant DCS/PLC"],
+      ["Lifecycle", "Specification through long-term support"],
     ],
   },
   {
-    label: "Series 43 &mdash; Rotary switches",
-    series: "6&ndash;63 A",
+    label: "Specialist mechanical packages",
+    series: "Rotary &amp; skid",
     specs: [
-      ["IP rating", "IP55"],
-      ["Current", "6 A to 63 A"],
-      ["Voltage", "440 VAC / 240 VDC"],
-      ["Positions", "Multiple, cam-configurable"],
+      ["Rotary equipment", "Pump, blower &amp; compressor packages"],
+      ["Skid packages", "Fully engineered mechanical assemblies"],
+      ["Testing", "FAT and on-site commissioning support"],
+      ["Support", "Documentation, spares, lifecycle services"],
     ],
   },
   {
-    label: "Series 45 &mdash; Unibody pushbutton",
-    series: "22 mm",
+    label: "Engineering &amp; design services",
+    series: "Concept &rarr; FEED",
     specs: [
-      ["Mounting", "22 mm"],
-      ["IP rating", "IP20 back / IP65 front"],
-      ["Depth", "Only 32 mm behind panel"],
-      ["Contacts", "Up to 9 stacks"],
+      ["Consulting", "Concept, feasibility, front-end design"],
+      ["Specification", "Datasheets, single-line diagrams, BoM"],
+      ["Compliance", "Industry standards &amp; safety codes"],
+      ["Partners", "Approved technology &amp; manufacturing partners"],
     ],
   },
   {
-    label: "Series 400 &mdash; Vandal-proof",
-    series: "Metal body",
+    label: "Asset-lifecycle support",
+    series: "Post-handover",
     specs: [
-      ["Body", "SS, copper, brass"],
-      ["Life", "100,000+ operations"],
-      ["Action", "Momentary / maintained"],
-      ["Illumination", "Center dot / outline"],
+      ["Commissioning", "On-site and remote commissioning"],
+      ["Maintenance", "Planned and reactive service"],
+      ["Spares", "Managed critical-spares programmes"],
+      ["Upgrades", "Obsolescence and modernisation planning"],
     ],
   },
 ];
@@ -78,14 +78,15 @@ export default function TechDetails() {
     <section className="tech" id="tech">
       <div className="tech__inner">
         <div className="tech__left">
-          <h2 className="tech__title">Technical details.</h2>
+          <h2 className="tech__title">What we deliver.</h2>
           <p className="tech__body">
-            Every Werner series is designed on real shop floors, tested to IEC,
-            and shipped with a full datasheet. Ten families, one standard of
-            build.
+            Solutions engineered end-to-end &mdash; from concept and design
+            through certified manufacture, commissioning and long-term
+            asset-lifecycle support. Six capability areas, one accountable
+            engineering partner.
           </p>
           <a href="#contact" className="tech__download">
-            Download full catalog
+            Talk to our engineers
             <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
               <path d="M7 2 V10 M4 7 L7 10 L10 7 M2 12 H12" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
             </svg>

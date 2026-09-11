@@ -10,27 +10,27 @@ const SwitchShowcase = dynamic(() => import("./SwitchShowcase"), {
 const cards = [
   {
     num: "01",
-    title: "Vandal-proof.",
-    body: "400 Series metal-body pushbuttons and E-stops — SS, copper and brass construction. Life of 100,000+ operations guaranteed.",
-    series: "Series 400",
+    title: "Control room systems.",
+    body: "Mosaic mimic panels, operator workstations, and consoles engineered for the plants and facilities running the world's critical assets.",
+    series: "Control Room",
   },
   {
     num: "02",
-    title: "Illuminated or not.",
-    body: "Series 41 with LED, incandescent or non-illuminated variants. 1NO+1NC up to 5NO+5NC contact stacks. Center-dot or outline illumination.",
-    series: "Series 41",
+    title: "Hazardous area & safety.",
+    body: "ATEX and IECEx-certified enclosures, junction boxes and control stations for Zone 1 / Zone 2 and safety-instrumented systems.",
+    series: "Ex-rated",
   },
   {
     num: "03",
-    title: "IP65 sealed front.",
-    body: "Series 45 unibody — IP20 back, IP65 front. Only 32 mm depth behind the panel. Protected against low-voltage glowing.",
-    series: "Series 45",
+    title: "Instrumentation.",
+    body: "Process instrumentation, field devices, and indication systems specified, integrated and supported across the asset lifecycle.",
+    series: "Instrumentation",
   },
   {
     num: "04",
-    title: "Seismic-zone 3 certified.",
-    body: "Series 41 with gold-plated contacts, tested and certified for seismic zone 3. The audit passes on the first try.",
-    series: "Series 41",
+    title: "Specialist mechanical.",
+    body: "Rotary equipment packages and specialist mechanical assemblies delivered with full documentation, testing and long-term support.",
+    series: "Mechanical",
   },
 ];
 
@@ -38,33 +38,34 @@ export default function FeatureGrid() {
   return (
     <section className="features" id="products">
       <div className="features__hero">
-        {/* .werner-cinematic-section is the ONLY element pinned by ScrollTrigger.
+        {/* .saltech-cinematic-section is the ONLY element pinned by ScrollTrigger.
             All new-implementation styles are scoped under this class in globals.css. */}
-        <div className="features__hero-inner werner-cinematic-section">
-          <p className="features__eyebrow">The catalog</p>
+        <div className="features__hero-inner saltech-cinematic-section">
+          <p className="features__eyebrow">What we deliver</p>
           <h2 className="features__title">
-            Ten series. <span className="features__title-soft">One standard.</span>
+            Our solutions <span className="features__title-soft">&amp; services.</span>
           </h2>
 
-          <div className="werner-cinematic-canvas" aria-hidden="true">
+          <div className="saltech-cinematic-canvas" aria-hidden="true">
             <SwitchShowcase />
           </div>
 
           <div className="features__caption">
-            <p className="features__caption-eyebrow">Series 41</p>
+            <p className="features__caption-eyebrow">Engineered</p>
             <ul className="features__caption-list">
-              <li>22 mm mount</li>
-              <li>Up to 5NO + 5NC</li>
-              <li>Seismic Zone 3 certified</li>
+              <li>Concept &amp; design</li>
+              <li>Manufacture &amp; test</li>
+              <li>Commissioning &amp; support</li>
             </ul>
           </div>
 
-          <div className="werner-cinematic-rear-text" aria-hidden="true">
-            <p className="werner-cinematic-rear-text__eyebrow">Engineered</p>
-            <h3 className="werner-cinematic-rear-text__title">From the inside out.</h3>
-            <p className="werner-cinematic-rear-text__body">
-              Silver-alloy contacts. Copper busbars. Precision-machined shaft.
-              Every internal component visible &mdash; every tolerance controlled.
+          <div className="saltech-cinematic-rear-text" aria-hidden="true">
+            <p className="saltech-cinematic-rear-text__eyebrow">Engineered</p>
+            <h3 className="saltech-cinematic-rear-text__title">From concept to commissioning.</h3>
+            <p className="saltech-cinematic-rear-text__body">
+              Engineering-led design, precision manufacture and full asset-lifecycle
+              support &mdash; delivered alongside asset owners, EPCs and system
+              integrators.
             </p>
           </div>
         </div>

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Werner Electric — Control that endures every shift.",
+  title: "Saltech | Engineering, Control Room & Industrial Solutions",
   description:
-    "Werner Electric — specialists in push buttons, switches, relays and signaling devices for industry. Engineered in India and Turkey.",
+    "Saltech designs, manufactures and integrates mosaic mimic panels, control-room systems, hazardous-area solutions and specialist industrial packages for demanding applications.",
   icons: {
     icon: "/logo.png",
     shortcut: "/logo.png",
@@ -20,13 +20,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="preconnect" href="https://api.fontshare.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
           rel="stylesheet"
-          href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700,800,900&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         />
-        <link rel="preload" as="video" href="/videos/hero.mp4" type="video/mp4" />
-        <link rel="preload" as="image" href="/images/hero.png" />
+        <link rel="preload" as="image" href="/images/hero-banner-section.png" />
       </head>
       <body>{children}</body>
     </html>

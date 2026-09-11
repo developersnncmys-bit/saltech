@@ -27,16 +27,16 @@ export default function About() {
       <div className="about__inner">
         <div className="about__sticky">
           <h2 className="about__heading">
-            About <em>Werner</em>
+            About <em>Saltech</em>
           </h2>
           <p className="about__body">
-            Werner Products boasts clean and crispy design, bulletproof product consistency and
+            Saltech Products boasts clean and crispy design, bulletproof product consistency and
             intuitive builds. All our products were created by top industry leaders in mechanical
             design and with extensive feedback of user experience. Improve your customer
-            satisfaction and enhance your product quality and profitability using Werner.
+            satisfaction and enhance your product quality and profitability using Saltech.
           </p>
           <p className="about__footnote">
-            Werner is built on four core values that inspire us to work together every day toward
+            Saltech is built on four core values that inspire us to work together every day toward
             improving the world.
           </p>
         </div>
@@ -48,7 +48,7 @@ export default function About() {
               <p className="about-card__quote">
                 Innovation and simplicity <em>make us happy.</em>
               </p>
-              <p className="about-card__quote-attr">Werner &mdash; product philosophy</p>
+              <p className="about-card__quote-attr">Saltech &mdash; product philosophy</p>
             </article>
 
             {values.map((v, i) => (

@@ -2,15 +2,13 @@ export default function Hero() {
   return (
     <header id="top" className="hero">
       <div className="hero__bg" aria-hidden="true">
-        <video
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           className="hero__img"
-          src="/videos/hero.mp4"
-          poster="/images/hero.png"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
+          src="/images/hero-banner-section.png"
+          alt=""
+          loading="eager"
+          decoding="async"
         />
         <div className="hero__vignette" />
       </div>
@@ -18,31 +16,30 @@ export default function Hero() {
       <div className="hero__stage">
         <div className="hero__center">
           <div className="hero__wordmark">
-            <p className="hero__eyebrow">Werner Electric</p>
+            <p className="hero__eyebrow">UK Engineering &amp; Industrial Solutions</p>
             <h1 className="hero__title">
-              One switch.<br />
-              A million shifts<span className="hero__title-dot">.</span>
+              Engineering &amp; Control Systems<br />
+              for Critical Industrial Environments<span className="hero__title-dot">.</span>
             </h1>
-          </div>
-
-          <div className="hero__statement" aria-hidden="true">
-            <p className="hero__statement-eyebrow">What Werner makes</p>
-            <p className="hero__statement-body">
-              Pushbuttons, switches, pilot lights.<br />
-              Six series. Panel ready. Plant tested.<br />
-              Built by hand for a million clean cycles.
+            <p className="hero__sub-body">
+              We design and manufacture mosaic mimic panels, control room systems,
+              hazardous-area solutions and specialist industrial packages for
+              demanding industrial environments.
             </p>
+
+            <ul className="hero__credibility" aria-label="Capabilities">
+              <li><span className="hero__credibility-dot" aria-hidden="true" />UK engineering, assembly and testing from Shaftesbury, Dorset</li>
+              <li><span className="hero__credibility-dot" aria-hidden="true" />Complete wired panels, FAT and site support</li>
+            </ul>
+
+            <div className="hero__cta-row">
+              <a href="#contact" className="btn btn--primary">Request a Quote</a>
+              <a href="#mosaic" className="btn btn--ghost">Explore Mosaic Mimic Systems</a>
+            </div>
           </div>
         </div>
 
-        <div className="hero__side">
-          <div className="hero__side-1">
-            <p className="hero__sub">
-              Every switch soldered, tuned and tested by hand.
-            </p>
-            <p className="hero__cue">Scroll to learn more.</p>
-          </div>
-        </div>
+        <p className="hero__scroll-cue">Scroll to know more.</p>
       </div>
     </header>
   );

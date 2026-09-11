@@ -1,29 +1,71 @@
 export default function Reframe() {
   return (
     <section className="reframe" id="story-intro">
-      <div className="reframe__sticky">
-        <div className="reframe__inner">
-          <h2 className="reframe__title">
-            Control{" "}
-            {/* Invisible inline placeholder that reserves the gap in the
-                headline — its position is measured by GSAP on mount to place
-                the button exactly here. */}
-            <span className="reframe__slot" aria-hidden="true" />{" "}
-            that endures every shift.
-          </h2>
-          <p className="reframe__body">
-            As the tactile layer between operator and machine, Werner&rsquo;s
-            switches deliver identical response through every shift &mdash; and
-            enhance operator trust and audit compliance from the first press to
-            the millionth.
+      {/* Cosmic curtain — a tall, sliding wrapper that contains BOTH
+          the red gradient bg (upper half) AND the content (lower
+          white half). On scroll GSAP translates its yPercent upward,
+          so the cosmic red slides out the top of the viewport and
+          the white portion (with the content sitting inside it)
+          rises into place. */}
+      <div className="reframe__cosmic">
+        <div className="reframe__sticky">
+          <div className="reframe__inner">
+          <p className="section-eyebrow reframe__section-eyebrow">About Saltech</p>
+
+          <div className="reframe__grid">
+            <div className="reframe__left">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                className="reframe__img"
+                src="https://images.pexels.com/photos/2760241/pexels-photo-2760241.jpeg?auto=compress&cs=tinysrgb&w=800"
+                alt="Industrial control room mimic panel"
+              />
+              <h2 className="reframe__title">
+                <span className="reframe__title-soft">
+                  Engineering-led
+                  <br />
+                  solutions.
+                </span>
+                <br />
+                <span className="reframe__title-strong">
+                  Built for critical
+                  <br />
+                  environments.
+                </span>
+              </h2>
+            </div>
+
+            <div className="reframe__right">
+              <p className="reframe__body">
+                Saltech designs, manufactures and integrates mosaic mimic
+                panels, control and indication systems, hazardous-area
+                solutions and specialist mechanical packages for applications
+                where reliability, clarity and long-term support matter.
+              </p>
+              <p className="reframe__body">
+                We work with asset owners, EPCs, system integrators, OEMs and
+                panel builders to provide engineered solutions from individual
+                components and replacement parts through to complete panels
+                and packaged systems.
+              </p>
+              <p className="reframe__body">
+                Our approach is systems-driven rather than catalogue-driven.
+                We work with established technology manufacturers and
+                manufacturing partners while selecting the right solution for
+                the application, project specification and lifecycle
+                requirements.
+              </p>
+              <a href="#about" className="reframe__cta">
+                Learn more about us
+              </a>
+            </div>
+          </div>
+
+          <p className="reframe__tagline">
+            From countless projects, engineering excellence emerges
           </p>
+          </div>
         </div>
-
-        {/* The red pushbutton is now rendered by <GlobalBall /> (mounted
-            at page root). GSAP measures .reframe__slot (still present in
-            the h2 above) each frame to position the single shared ball. */}
-
-        <p className="reframe__eyebrow">Engineered for a million cycles.</p>
       </div>
     </section>
   );
