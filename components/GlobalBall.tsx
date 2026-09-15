@@ -27,9 +27,9 @@ export default function GlobalBall() {
           <defs>
             {/* Reframe-era amber tile gradient — default state. */}
             <linearGradient id="tile-amber" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#FF8072" />
-              <stop offset="50%" stopColor="#FE3529" />
-              <stop offset="100%" stopColor="#B01A12" />
+              <stop offset="0%" stopColor="#2a2a2a" />
+              <stop offset="50%" stopColor="#111111" />
+              <stop offset="100%" stopColor="#000000" />
             </linearGradient>
             {/* Clip path — used to constrain the mimic-panel photo to
                 the tile's rounded-square footprint. */}
@@ -90,7 +90,7 @@ export default function GlobalBall() {
             width="164"
             height="164"
             rx="6"
-            fill="#B01A12"
+            fill="#000000"
           />
 
           {/* Gradient overlay — always visible.

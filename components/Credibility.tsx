@@ -21,24 +21,6 @@ const orgs = [
   { name: "Valero", slug: "valero" },
 ];
 
-const rowA = orgs.slice(0, 10);
-const rowB = orgs.slice(10);
-
-function Row({ items, reverse }: { items: typeof orgs; reverse?: boolean }) {
-  return (
-    <div className={`cred__row${reverse ? " cred__row--reverse" : ""}`}>
-      <ul className="cred__track" aria-label="Client organisations">
-        {[...items, ...items].map((o, i) => (
-          <li className="cred__logo" key={`${o.slug}-${i}`} aria-hidden={i >= items.length ? "true" : undefined}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`/logos/${o.slug}.png`} alt={i >= items.length ? "" : o.name} loading="lazy" />
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 export default function Credibility() {
   return (
     <section className="cred" id="credibility">
@@ -54,10 +36,15 @@ export default function Credibility() {
             ISO 9001:2015 Certified
           </span>
         </div>
-      </div>
-      <div className="cred__marquee">
-        <Row items={rowA} />
-        <Row items={rowB} reverse />
+
+        <ul className="cred__grid" aria-label="Client organisations">
+          {orgs.map((o) => (
+            <li className="cred__cell" key={o.slug}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={`/logos/${o.slug}.png`} alt={o.name} loading="lazy" />
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

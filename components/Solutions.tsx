@@ -1,12 +1,14 @@
 const scenes = [
-  {
-    id: "mosaic",
-    title: "Mosaic Mimic Systems",
-    body: "New mosaic panels, panel extensions, modifications, legacy replacements, spares and complete control-room mimic systems.",
-    cta: "Explore Mosaic Mimic Systems",
-    href: "#mosaic",
-    image: "/images/mosaic-mimic.png",
-  },
+  // Mosaic Mimic Systems scene commented out — timeline now starts at
+  // "Solution 2" (Control Room & Operator Systems).
+  // {
+  //   id: "mosaic",
+  //   title: "Mosaic Mimic Systems",
+  //   body: "New mosaic panels, panel extensions, modifications, legacy replacements, spares and complete control-room mimic systems.",
+  //   cta: "Explore Mosaic Mimic Systems",
+  //   href: "#mosaic",
+  //   image: "/images/mosaic-mimic.png",
+  // },
   {
     id: "control-room",
     title: "Control Room & Operator Systems",
@@ -39,13 +41,27 @@ export default function Solutions() {
       <div className="solutions__inner">
         <div className="solutions__head">
           <p className="section-eyebrow">What we deliver</p>
-          <h2 className="solutions__title">Four connected solution areas.</h2>
+          <h2 className="solutions__title">Three more connected solution areas.</h2>
         </div>
       </div>
 
       <div className="sol-scenes">
-        {scenes.map((s) => (
-          <article className="sol-scene" id={s.id} key={s.id}>
+        {/* Persistent scroll marker — sticks in the middle of the viewport
+            while user scrolls through the 4 scenes. JS in Animations.tsx
+            updates the label ("Solution 1" → "Solution 2" ...) as each
+            scene enters. Matches the reference's "Day N" pill behaviour. */}
+        <div className="sol-marker" aria-hidden="true">
+          <span className="sol-marker__dot" />
+          <span className="sol-marker__label">Solution 2</span>
+        </div>
+
+        {scenes.map((s, i) => (
+          <article
+            className="sol-scene"
+            id={s.id}
+            key={s.id}
+            data-sol-index={i + 2}
+          >
             <div className="sol-scene__media">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={s.image} alt="" loading="lazy" />

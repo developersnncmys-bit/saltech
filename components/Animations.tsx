@@ -104,7 +104,10 @@ export default function Animations() {
             start: "top top",
             end: "+=80%",
             pin: true,
-            scrub: 1,
+            // Tight scrub (was 1s smoothing) so the phase-0 → phase-1
+            // transition stays glued to scroll — no lag-window where the
+            // title and sub-body can both be partially visible together.
+            scrub: 0.3,
             anticipatePin: 1,
           },
         })
@@ -124,33 +127,39 @@ export default function Animations() {
           // the visible sub-body + credibility + CTA group is centred in the
           // viewport (the invisible eyebrow+title above still take flex
           // space and would otherwise push the visible block low).
-          .to(".hero__wordmark", { yPercent: -22, ease: "power2.out", duration: 0.35 }, 0.30)
-          // Eyebrow + title fade + lift out during the transition.
-          // Explicit fromTo so the scrub can't inherit opacity 0 from the
-          // intro's .from() (which was making them invisible on phase 0).
+          // Wordmark shift completes at 0.50 — BEFORE sub-body starts —
+          // so the container isn't still travelling while phase-1 content
+          // is fading in.
+          .to(".hero__wordmark", { yPercent: -22, ease: "power2.out", duration: 0.20 }, 0.30)
+          // Eyebrow + title fade + LIFT OFF (0.30 → 0.48).
           .fromTo(".hero__eyebrow",
             { opacity: 1, y: 0 },
-            { opacity: 0, y: -14, ease: "power2.in", duration: 0.25 },
+            { opacity: 0, y: -20, ease: "power2.in", duration: 0.18 },
             0.30
           )
           .fromTo(".hero__title",
             { opacity: 1, y: 0 },
-            { opacity: 0, y: -32, ease: "power2.in", duration: 0.30 },
+            { opacity: 0, y: -60, ease: "power2.in", duration: 0.18 },
             0.30
           )
-          // Sub-body — the new phase-1 anchor. Crossfades in while the
-          // headline dissolves, scaling up ~35% so it reads as a mid-size
-          // headline (bigger than body copy, smaller than the H1).
+          // Yank title + eyebrow out of the flex flow the moment they're
+          // fully faded. Reserves ZERO space during phase 1, so the
+          // sub-body's 1.6× scale can't accidentally overlap them.
+          // visibility toggles reverse cleanly with scrub scroll-up.
+          .set(".hero__title",   { visibility: "hidden" }, 0.48)
+          .set(".hero__eyebrow", { visibility: "hidden" }, 0.48)
+          // Clean beat of empty stage from 0.48 → 0.56 — nothing visible
+          // in the centre band. Then sub-body enters.
           .to(".hero__sub-body", {
             opacity: 1, y: 0,
             scale: 1.6,
             transformOrigin: "center center",
             color: "#ffffff",
             fontWeight: 700,
-            ease: "power2.out", duration: 0.35,
-          }, 0.35)
-          .to(".hero__credibility", { opacity: 1, y: 0, ease: "power2.out", duration: 0.3 }, 0.65)
-          .to(".hero__cta-row", { opacity: 1, y: 0, ease: "power2.out", duration: 0.3 }, 0.80);
+            ease: "power2.out", duration: 0.20,
+          }, 0.56)
+          .to(".hero__credibility", { opacity: 1, y: 0, ease: "power2.out", duration: 0.22 }, 0.78)
+          .to(".hero__cta-row", { opacity: 1, y: 0, ease: "power2.out", duration: 0.22 }, 0.88);
       }
 
       /* -------------------------------------------------- REFRAME
@@ -183,10 +192,10 @@ export default function Animations() {
       if (reframe) {
         gsap.set(".reframe__cosmic", { yPercent: 0 });
 
-        // Scroll-triggered wash — NO pin. As the section enters the
+        // Scroll-triggered wash — no pin. As the section enters the
         // viewport, the cosmic layer slides upward, revealing the
-        // white content half. Start when section top hits viewport
-        // bottom, complete by the time section top hits viewport top.
+        // white content half underneath. Runs from when the section
+        // top hits viewport bottom until it reaches viewport top.
         gsap
           .timeline({
             defaults: { ease: "none" },
@@ -496,8 +505,8 @@ export default function Animations() {
       const cycleMarker = document.querySelector<HTMLElement>(".global-ball");
       const cycleMarkerOrb = cycleMarker?.querySelector<HTMLElement>(".global-ball-orb");
       const cycleMarkerTime = document.querySelector<HTMLElement>(".global-ball-time");
-      const cycleIntro = document.querySelector<HTMLElement>(".cycle__intro");
-      const shiftEls = gsap.utils.toArray<HTMLElement>(".shift");
+      const cycleIntro = document.querySelector<HTMLElement>(".solutions__head");
+      const shiftEls = gsap.utils.toArray<HTMLElement>(".sol-scene");
       const firstShift = shiftEls[0];
       const lastShift = shiftEls[shiftEls.length - 1];
 
@@ -601,9 +610,9 @@ export default function Animations() {
           );
 
         // TIME INTERPOLATION — start showing the label when the first shift
-        // enters, then tick forward continuously with scroll through all 5.
-        // Times as minutes since midnight (02:00 next day = 1560).
-        const times = [360, 720, 1080, 1320, 1560]; // 06:00 12:00 18:00 22:00 02:00+1
+        // enters, then tick forward continuously with scroll through all 4.
+        // Times as minutes since midnight, one per Solutions scene.
+        const times = [360, 720, 1080, 1320]; // 06:00 12:00 18:00 22:00
         const fmt = (mins: number) => {
           const total = Math.round(mins);
           const h = Math.floor(total / 60) % 24;
@@ -611,10 +620,10 @@ export default function Animations() {
           return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
         };
 
-        // Each shift's TITLE is the anchor — time reveals when a title
+        // Each scene's TITLE is the anchor — time reveals when a title
         // reaches viewport center and updates as titles pass through it.
         const shiftTitles = shiftEls.map(
-          (s) => s.querySelector<HTMLElement>(".shift__title") ?? s
+          (s) => s.querySelector<HTMLElement>(".sol-scene__title") ?? s
         );
         const lastTitle = shiftTitles[shiftTitles.length - 1];
 
@@ -875,7 +884,7 @@ export default function Animations() {
       }
 
       /* -------------------------------------------------- FINAL CTA — word-by-word scrub reveal */
-      const finalText = document.querySelector<HTMLElement>(".final__text");
+      const finalText = document.querySelector<HTMLElement>(".final__title, .final__text");
       if (finalText) {
         const words = Array.from(
           finalText.querySelectorAll<HTMLElement>(".final__word")
@@ -924,6 +933,53 @@ export default function Animations() {
           once: true,
         });
       });
+
+      /* -------------------------------------------------- SOLUTIONS MARKER
+         Fixed "Solution N" pill (center of viewport) driven by
+         IntersectionObserver — more reliable than ScrollTrigger here
+         because FeatureGrid uses a sticky container above that can
+         desync ScrollTrigger's cached offsets.
+           - Pill is visible only while a .sol-scene overlaps the
+             viewport's vertical centre band (top:50% / bottom:50%).
+           - Label always reflects the sol-scene currently under the
+             viewport centre. */
+      const solMarker = document.querySelector<HTMLElement>(".sol-marker");
+      const solLabel = solMarker?.querySelector<HTMLElement>(".sol-marker__label");
+      const solScenesList = Array.from(
+        document.querySelectorAll<HTMLElement>(".sol-scene")
+      );
+      if (solMarker && solLabel && solScenesList.length > 0) {
+        const activeScenes = new Set<HTMLElement>();
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              const el = entry.target as HTMLElement;
+              if (entry.isIntersecting) activeScenes.add(el);
+              else activeScenes.delete(el);
+            });
+            if (activeScenes.size === 0) {
+              solMarker.classList.remove("is-visible");
+              return;
+            }
+            solMarker.classList.add("is-visible");
+            // Pick the topmost active scene as the current label source.
+            const topmost = Array.from(activeScenes).sort((a, b) => {
+              return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
+            })[0];
+            const idx = Number(topmost.dataset.solIndex) || 1;
+            solLabel.textContent = `Solution ${idx}`;
+          },
+          {
+            // Only fires while a scene overlaps the viewport's centre band.
+            // 50% top + 50% bottom means the visible root region is a
+            // zero-height line at viewport center — a scene "intersects"
+            // when any part of it crosses that line.
+            rootMargin: "-50% 0px -50% 0px",
+            threshold: 0,
+          }
+        );
+        solScenesList.forEach((s) => observer.observe(s));
+      }
 
       /* -------------------------------------------------- BALL SAFETY NET
          Defensive scroll listener that ENFORCES "ball hidden in Hero

@@ -1,54 +1,32 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-const cards: { title: string; body: string; icon: ReactNode }[] = [
+// Copy locked to brief — presentation redesigned to a horizontal
+// progression timeline instead of a 2×2 grid. Reads as "we scale
+// from a single component all the way up to a complete system."
+const waypoints = [
   {
-    title: "Components\n& Spares",
+    title: "Components & Spares",
     body: "Individual components, replacement parts and spares to keep existing systems running.",
-    icon: (
-      <svg viewBox="0 0 40 40" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <circle cx="20" cy="20" r="4.5" pathLength={1} />
-        <path d="M20 6 L20 11 M20 29 L20 34 M6 20 L11 20 M29 20 L34 20 M10 10 L14 14 M26 26 L30 30 M10 30 L14 26 M26 14 L30 10" pathLength={1} />
-      </svg>
-    ),
+    scale: "Component-level",
   },
   {
-    title: "Modifications\n& Extensions",
+    title: "Modifications & Extensions",
     body: "Existing panel modifications and extensions, facias and panel adjustments.",
-    icon: (
-      <svg viewBox="0 0 40 40" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M8 26 L8 8 L26 8" pathLength={1} />
-        <path d="M14 32 L32 32 L32 14" pathLength={1} />
-        <path d="M8 8 L32 32" strokeDasharray="1.5 3" opacity="0.5" pathLength={1} />
-      </svg>
-    ),
+    scale: "Sub-assembly",
   },
   {
-    title: "Complete Panels\n& Systems",
+    title: "Complete Panels & Systems",
     body: "Complete wired panels, control-room assemblies and operator interfaces.",
-    icon: (
-      <svg viewBox="0 0 40 40" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <rect x="6" y="6" width="28" height="28" pathLength={1} />
-        <path d="M6 15 L34 15 M15 6 L15 34" pathLength={1} />
-        <circle cx="24" cy="24" r="1" fill="currentColor" stroke="none" />
-        <circle cx="28" cy="24" r="1" fill="currentColor" stroke="none" />
-        <circle cx="24" cy="28" r="1" fill="currentColor" stroke="none" />
-        <circle cx="28" cy="28" r="1" fill="currentColor" stroke="none" />
-      </svg>
-    ),
+    scale: "Panel-scale",
   },
   {
-    title: "Installation\n& Site Support",
+    title: "Installation & Site Support",
     body: "Installation and site support delivered from our facility in Shaftesbury, Dorset.",
-    icon: (
-      <svg viewBox="0 0 40 40" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M6 18 L20 6 L34 18 L34 34 L6 34 Z" pathLength={1} />
-        <path d="M16 34 L16 22 L24 22 L24 34" pathLength={1} />
-      </svg>
-    ),
+    scale: "Site-wide",
   },
 ];
 
@@ -68,94 +46,67 @@ export default function ComponentsToSystems() {
       const eyebrow = root.querySelector(".cts__eyebrow");
       const titleLines = root.querySelectorAll(".cts__title-line");
       const sub = root.querySelector(".cts__sub");
-      const cards = root.querySelectorAll<HTMLElement>(".cts-card");
+      const trackFill = root.querySelector<HTMLElement>(".cts__track-fill");
+      const nodes = root.querySelectorAll<HTMLElement>(".cts__waypoint-node");
+      const waypointsEls = root.querySelectorAll<HTMLElement>(".cts__waypoint");
 
+      // Header reveal (one-shot).
       gsap.set(eyebrow, { yPercent: 130, opacity: 0 });
       gsap.set(titleLines, { yPercent: 105, opacity: 0 });
       gsap.set(sub, { y: 24, opacity: 0 });
-      gsap.set(cards, { yPercent: 30, opacity: 0, clipPath: "inset(0 100% 0 0)" });
+      gsap.set(nodes, { scale: 0, opacity: 0 });
+      gsap.set(waypointsEls, { y: 30, opacity: 0 });
 
-      const tl = gsap.timeline({
+      const headTl = gsap.timeline({
         defaults: { ease: "power3.out" },
         scrollTrigger: { trigger: root, start: "top 72%", once: true },
       });
-      tl.to(eyebrow, { yPercent: 0, opacity: 1, duration: 0.55 })
+      headTl
+        .to(eyebrow, { yPercent: 0, opacity: 1, duration: 0.55 })
         .to(titleLines, { yPercent: 0, opacity: 1, duration: 0.9, stagger: 0.08 }, "-=0.3")
         .to(sub, { y: 0, opacity: 1, duration: 0.65 }, "-=0.55")
-        .to(cards, {
-          yPercent: 0,
+        .to(nodes, {
+          scale: 1,
           opacity: 1,
-          clipPath: "inset(0 0% 0 0)",
-          duration: 1.0,
-          stagger: 0.12,
-          ease: "power4.out",
-        }, "-=0.35");
+          duration: 0.6,
+          stagger: 0.15,
+          ease: "back.out(2)",
+        }, "-=0.3")
+        .to(waypointsEls, {
+          y: 0,
+          opacity: 1,
+          duration: 0.7,
+          stagger: 0.15,
+          ease: "power3.out",
+        }, "-=0.85");
 
-      cards.forEach((card, i) => {
-        const num = card.querySelector<HTMLElement>(".cts-card__num");
-        const inner = card.querySelector<HTMLElement>(".cts-card__inner");
-        const paths = card.querySelectorAll<SVGPathElement | SVGCircleElement | SVGRectElement>(
-          ".cts-card__icon svg path[pathLength], .cts-card__icon svg circle[pathLength], .cts-card__icon svg rect[pathLength]"
-        );
-        const rule = card.querySelector<HTMLElement>(".cts-card__rule");
-        const icon = card.querySelector<HTMLElement>(".cts-card__icon");
-        const glow = card.querySelector<HTMLElement>(".cts-card__glow");
-        const brackets = card.querySelectorAll<HTMLElement>(".cts-card__bracket");
-
-        gsap.set(paths, { strokeDasharray: 1, strokeDashoffset: 1 });
-        gsap.set(inner, { opacity: 0, y: 20 });
-
-        const drawTl = gsap.timeline({
-          scrollTrigger: { trigger: card, start: "top 80%", once: true },
-          delay: i * 0.12,
+      // Track fill — one-shot draw across the rail on section enter.
+      // Scrub was unreliable because the section is short vertically so
+      // the scroll distance for the scrub was too small to be visible.
+      if (trackFill) {
+        gsap.set(trackFill, { scaleX: 0, transformOrigin: "left center" });
+        gsap.to(trackFill, {
+          scaleX: 1,
+          duration: 1.6,
+          ease: "power2.inOut",
+          scrollTrigger: { trigger: root, start: "top 65%", once: true },
         });
-        drawTl
-          .to(inner, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2)
-          .to(paths, {
-            strokeDashoffset: 0,
-            duration: 1.1,
-            ease: "power2.inOut",
-            stagger: 0.06,
-          }, 0.35);
+      }
 
-        if (num) {
-          const target = i + 1;
-          const counter = { v: 0 };
-          gsap.to(counter, {
-            v: target,
-            duration: 1.2,
-            ease: "power2.out",
-            scrollTrigger: { trigger: card, start: "top 80%", once: true },
-            delay: i * 0.1,
-            onUpdate: () => {
-              num.textContent = String(Math.round(counter.v)).padStart(2, "0");
-            },
-          });
-        }
-
-        const onMove = (e: MouseEvent) => {
-          const r = card.getBoundingClientRect();
-          const x = ((e.clientX - r.left) / r.width) * 100;
-          const y = ((e.clientY - r.top) / r.height) * 100;
-          card.style.setProperty("--mx", `${x}%`);
-          card.style.setProperty("--my", `${y}%`);
-        };
-        const enter = () => {
-          gsap.to(rule, { scaleX: 1, duration: 0.55, ease: "power3.out" });
-          gsap.to(icon, { rotate: 90, scale: 1.05, duration: 0.7, ease: "power3.out" });
-          gsap.to(glow, { opacity: 1, duration: 0.5, ease: "power2.out" });
-          gsap.to(brackets, { scale: 1, opacity: 1, duration: 0.55, stagger: 0.06, ease: "power3.out" });
-          card.addEventListener("mousemove", onMove);
-        };
-        const leave = () => {
-          gsap.to(rule, { scaleX: 0, duration: 0.45, ease: "power3.in" });
-          gsap.to(icon, { rotate: 0, scale: 1, duration: 0.7, ease: "power3.out" });
-          gsap.to(glow, { opacity: 0, duration: 0.4, ease: "power2.out" });
-          gsap.to(brackets, { scale: 0.6, opacity: 0, duration: 0.4, ease: "power3.in" });
-          card.removeEventListener("mousemove", onMove);
-        };
-        card.addEventListener("mouseenter", enter);
-        card.addEventListener("mouseleave", leave);
+      // Number counters — count up per waypoint when it enters.
+      waypointsEls.forEach((wp, i) => {
+        const numEl = wp.querySelector<HTMLElement>(".cts__waypoint-num");
+        if (!numEl) return;
+        const counter = { v: 0 };
+        gsap.to(counter, {
+          v: i + 1,
+          duration: 0.9,
+          ease: "power2.out",
+          scrollTrigger: { trigger: wp, start: "top 85%", once: true },
+          onUpdate: () => {
+            numEl.textContent = String(Math.round(counter.v)).padStart(2, "0");
+          },
+        });
       });
     }, root);
 
@@ -180,30 +131,29 @@ export default function ComponentsToSystems() {
           </p>
         </header>
 
-        <div className="cts__grid">
-          {cards.map((c, i) => (
-            <article className="cts-card" key={c.title}>
-              <span className="cts-card__glow" aria-hidden="true" />
-              <span className="cts-card__bracket cts-card__bracket--tl" aria-hidden="true" />
-              <span className="cts-card__bracket cts-card__bracket--tr" aria-hidden="true" />
-              <span className="cts-card__bracket cts-card__bracket--bl" aria-hidden="true" />
-              <span className="cts-card__bracket cts-card__bracket--br" aria-hidden="true" />
+        <div className="cts__timeline" role="list">
+          {/* Dashed rail that runs behind all four waypoint nodes. */}
+          <span className="cts__track" aria-hidden="true">
+            <span className="cts__track-fill" />
+          </span>
 
-              <div className="cts-card__inner">
-                <div className="cts-card__top">
-                  <span className="cts-card__num">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="cts-card__icon" aria-hidden="true">{c.icon}</span>
+          <ol className="cts__waypoints">
+            {waypoints.map((w, i) => (
+              <li className="cts__waypoint" role="listitem" key={w.title}>
+                <span className="cts__waypoint-node" aria-hidden="true">
+                  <span className="cts__waypoint-node-inner" />
+                </span>
+                <div className="cts__waypoint-body">
+                  <div className="cts__waypoint-meta">
+                    <span className="cts__waypoint-num">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="cts__waypoint-scale">{w.scale}</span>
+                  </div>
+                  <h3 className="cts__waypoint-title">{w.title}</h3>
+                  <p className="cts__waypoint-body-text">{w.body}</p>
                 </div>
-                <h3 className="cts-card__title">
-                  {c.title.split("\n").map((ln, idx) => (
-                    <span key={idx}>{ln}</span>
-                  ))}
-                </h3>
-                <p className="cts-card__body">{c.body}</p>
-              </div>
-              <span className="cts-card__rule" aria-hidden="true" />
-            </article>
-          ))}
+              </li>
+            ))}
+          </ol>
         </div>
       </div>
     </section>

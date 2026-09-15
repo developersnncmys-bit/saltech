@@ -144,7 +144,7 @@ export default function EngineeringUnderOneRoof() {
     <section className="euor" id="engineering" ref={rootRef}>
       <div className="euor__inner">
         <header className="euor__head">
-          <div className="euor__head-top">
+          <div className="euor__head-lead">
             <div className="euor__eyebrow-clip">
               <p className="euor__eyebrow">Engineering-led</p>
             </div>
@@ -154,7 +154,7 @@ export default function EngineeringUnderOneRoof() {
               <span className="euor__title-clip"><span className="euor__title-line">UNDER ONE ROOF.</span></span>
             </h2>
           </div>
-          <div className="euor__head-bottom">
+          <div className="euor__head-aside">
             <p className="euor__sub">
               From technical selection and engineering through integration,
               assembly, wiring, testing, FAT and site support &mdash; delivered
@@ -164,9 +164,10 @@ export default function EngineeringUnderOneRoof() {
           </div>
         </header>
 
-        <div className="euor__list">
+        <div className="euor__grid">
           {cards.map((c) => (
             <article className="euor-item" key={c.title}>
+              <span className="euor-item__rule" aria-hidden="true" />
               <div className="euor-item__icon" aria-hidden="true">
                 <DotIcon dots={c.dots} />
               </div>
@@ -176,7 +177,6 @@ export default function EngineeringUnderOneRoof() {
                 ))}
               </h3>
               <p className="euor-item__body">{c.body}</p>
-              <span className="euor-item__rule" aria-hidden="true" />
             </article>
           ))}
         </div>

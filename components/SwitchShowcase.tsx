@@ -334,17 +334,32 @@ export default function SwitchShowcase() {
     const eyebrow  = section.querySelector<HTMLElement>(".features__eyebrow");
     const title    = section.querySelector<HTMLElement>(".features__title");
     const caption  = section.querySelector<HTMLElement>(".features__caption");
-    // Rear-text children animate INDIVIDUALLY (staggered editorial entrance):
-    // ENGINEERED → heading → paragraph
+    const canvas   = section.querySelector<HTMLElement>(".saltech-cinematic-canvas");
+    // Pre-reveal intro — three paragraphs arranged as a horizontal row.
+    // Each reveals in sequence during the first half of the scroll, then
+    // they exit together so the 3D model can take over.
+    const introParas = Array.from(
+      section.querySelectorAll<HTMLElement>(".features__intro-para")
+    );
+    // Rear text — reveals WITH the 3D model in the second half of the
+    // scroll. Contains the Mosaic Mimic Systems solution copy.
+    const rearTag     = section.querySelector<HTMLElement>(".saltech-cinematic-rear-text__tag");
     const rearEyebrow = section.querySelector<HTMLElement>(".saltech-cinematic-rear-text__eyebrow");
     const rearTitle   = section.querySelector<HTMLElement>(".saltech-cinematic-rear-text__title");
     const rearBody    = section.querySelector<HTMLElement>(".saltech-cinematic-rear-text__body");
-    const rearChildren: (HTMLElement | null)[] = [rearEyebrow, rearTitle, rearBody];
+    const rearChildren: (HTMLElement | null)[] = [rearTag, rearEyebrow, rearTitle, rearBody];
 
-    // Explicit progress-0 text state
+    // Explicit progress-0 text state — 3D canvas, caption and rear text
+    // all start hidden. The horizontal intro paragraphs also start hidden
+    // and reveal in sequence during the pre-reveal phase.
     if (eyebrow) { eyebrow.style.opacity = "1"; eyebrow.style.transform = "translateX(-50%) translateY(0px)"; }
     if (title)   { title.style.opacity   = "1"; title.style.transform   = "translateX(-50%) translateY(0px)"; }
-    if (caption) caption.style.opacity = "1";
+    if (caption) caption.style.opacity = "0";
+    if (canvas)  canvas.style.opacity  = "0";
+    introParas.forEach((el) => {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(30px)";
+    });
     rearChildren.forEach((el) => {
       if (!el) return;
       el.style.opacity = "0";
@@ -375,21 +390,77 @@ export default function SwitchShowcase() {
       el.style.transform = `translateY(${lerp(20, 0, inK)}px)`;
     };
 
+    // Sequenced-paragraph reveal for the rear body slot. Each paragraph
+    // has its own visible window inside the "engineering scene" (0.70–1.00).
+    // Ranges chosen so each holds long enough to read + brief cross-fades
+    // between them. All three exit together during 0.94–1.00 so the last
+    // paragraph joins the rest of the rear text in leaving the scene.
+    const applyRearParagraph = (
+      el: HTMLElement | null,
+      inStart: number,
+      inEnd: number,
+      outStart: number,
+      outEnd: number,
+      p: number,
+    ) => {
+      if (!el) return;
+      const inK  = rampIn(p, inStart, inEnd);
+      const outK = 1 - rampIn(p, outStart, outEnd);
+      const exitK = rampOut(p, 0.94, 1.00);
+      el.style.opacity = String(inK * outK * exitK);
+      el.style.transform = `translateY(${lerp(20, 0, inK)}px)`;
+    };
+
     const applyText = (p: number) => {
+      // Section headline holds through the paragraph sequence, then
+      // fades out during the 3D-reveal transition (0.50 → 0.62).
       if (eyebrow) {
-        const k = rampIn(p, 0.10, 0.18);
+        const k = rampIn(p, 0.50, 0.58);
         eyebrow.style.opacity = String(1 - k);
         eyebrow.style.transform = `translateX(-50%) translateY(${lerp(0, -10, k)}px)`;
       }
       if (title) {
-        const k = rampIn(p, 0.15, 0.28);
+        const k = rampIn(p, 0.50, 0.62);
         title.style.opacity = String(1 - k);
         title.style.transform = `translateX(-50%) translateY(${lerp(0, -22, k)}px)`;
       }
-      if (caption) caption.style.opacity = String(rampOut(p, 0.20, 0.32));
+      // Caption + 3D canvas — enter together at 0.55 (with a light exit
+      // ramp so they leave with the rest of the section at 0.94–1.00).
+      if (caption) {
+        const inK  = rampIn(p, 0.55, 0.65);
+        const outK = rampOut(p, 0.94, 1.00);
+        caption.style.opacity = String(inK * outK);
+      }
+      if (canvas) {
+        const inK  = rampIn(p, 0.52, 0.65);
+        const outK = rampOut(p, 0.94, 1.00);
+        canvas.style.opacity = String(inK * outK);
+      }
+
+      // Horizontal intro paragraphs — stagger in during 0.05 → 0.44,
+      // hold through 0.44 → 0.50, exit together 0.50 → 0.58 so the 3D
+      // canvas can fade in cleanly on empty stage.
+      const introOut = 1 - rampIn(p, 0.50, 0.58);
+      const introY = lerp(30, 0, 1 - introOut);
+      const paraTimings: [number, number][] = [
+        [0.05, 0.14],
+        [0.16, 0.25],
+        [0.28, 0.38],
+      ];
+      introParas.forEach((el, i) => {
+        const t = paraTimings[i] ?? [0, 0];
+        const inK = rampIn(p, t[0], t[1]);
+        el.style.opacity = String(inK * introOut);
+        el.style.transform = `translateY(${lerp(30, 0, inK) + introY * 0.3}px)`;
+      });
+
+      // Rear text (Solution 01 tag → Mosaic Mimic eyebrow → body) — enters
+      // WITH the 3D model at 0.58+, staggered so the tag lands first, holds
+      // until section exit.
+      applyRearChild(rearTag,     0.58, 0.66, p);
       applyRearChild(rearEyebrow, 0.62, 0.70, p);
-      applyRearChild(rearTitle,   0.66, 0.74, p);
-      applyRearChild(rearBody,    0.70, 0.78, p);
+      applyRearChild(rearTitle,   0.62, 0.70, p);
+      applyRearChild(rearBody,    0.66, 0.74, p);
     };
     applyText(0);
 
@@ -412,7 +483,13 @@ export default function SwitchShowcase() {
         anticipatePin: 1,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
-          progressRef.current = self.progress;
+          // Camera stages are remapped: the first 55% of scroll is the
+          // paragraph-reveal phase (3D canvas hidden). The camera only
+          // starts moving during the remaining 45% (0.55 → 1.00), giving
+          // it the full stage-1 → stage-7 keyframe sweep even though its
+          // effective progress is compressed.
+          const cameraP = Math.max(0, (self.progress - 0.55) / 0.45);
+          progressRef.current = cameraP;
           applyText(self.progress);
         },
       });

@@ -41,36 +41,76 @@ export default function FeatureGrid() {
         {/* .saltech-cinematic-section is the ONLY element pinned by ScrollTrigger.
             All new-implementation styles are scoped under this class in globals.css. */}
         <div className="features__hero-inner saltech-cinematic-section">
-          <p className="features__eyebrow">What we deliver</p>
           <h2 className="features__title">
-            Our solutions <span className="features__title-soft">&amp; services.</span>
+            <span className="features__title-soft">Engineering-led solutions</span>
+            <br />
+            <span className="features__title-strong">for demanding industrial environments.</span>
           </h2>
+
+          {/* Pre-reveal intro — three paragraphs arranged as a horizontal
+              row across the middle of the section. Each fades in one after
+              another during the FIRST half of the scroll; then all three
+              fade out together so the 3D model can take over. */}
+          <div className="features__intro" aria-hidden="true">
+            <p className="features__intro-para" data-idx="1">
+              Saltech designs, manufactures and integrates mosaic mimic panels,
+              control and indication systems, hazardous-area solutions and
+              specialist mechanical packages for applications where reliability,
+              clarity and long-term support matter.
+            </p>
+            <p className="features__intro-para" data-idx="2">
+              We work with asset owners, EPCs, system integrators, OEMs and
+              panel builders to provide engineered solutions from individual
+              components and replacement parts through to complete panels
+              and packaged systems.
+            </p>
+            <p className="features__intro-para" data-idx="3">
+              Our approach is systems-driven rather than catalogue-driven. We
+              work with established technology manufacturers and manufacturing
+              partners while selecting the right solution for the application,
+              project specification and lifecycle requirements.
+            </p>
+          </div>
 
           <div className="saltech-cinematic-canvas" aria-hidden="true">
             <SwitchShowcase />
           </div>
 
+          {/* Bottom-right SOLUTIONS caption removed per client. Kept as a
+              JSX comment for quick restore.
           <div className="features__caption">
-            <p className="features__caption-eyebrow">Engineered</p>
+            <p className="features__caption-eyebrow">Solutions</p>
             <ul className="features__caption-list">
-              <li>Concept &amp; design</li>
-              <li>Manufacture &amp; test</li>
-              <li>Commissioning &amp; support</li>
+              <li>Mosaic Mimic Systems</li>
+              <li>Control Room &amp; Operator Systems</li>
+              <li>Hazardous Area &amp; Safety</li>
+              <li>Mechanical &amp; Engineered Packages</li>
             </ul>
           </div>
+          */}
 
+          {/* Rear text — reveals with the 3D model. Features the Mosaic
+              Mimic Systems solution copy (the flagship product line the
+              model represents). */}
           <div className="saltech-cinematic-rear-text" aria-hidden="true">
-            <p className="saltech-cinematic-rear-text__eyebrow">Engineered</p>
-            <h3 className="saltech-cinematic-rear-text__title">From concept to commissioning.</h3>
+            <div className="saltech-cinematic-rear-text__tag">
+              <span className="saltech-cinematic-rear-text__tag-dot" aria-hidden="true" />
+              <span className="saltech-cinematic-rear-text__tag-label">Solution 1</span>
+            </div>
+            <p className="saltech-cinematic-rear-text__eyebrow">Mosaic Mimic Systems</p>
             <p className="saltech-cinematic-rear-text__body">
-              Engineering-led design, precision manufacture and full asset-lifecycle
-              support &mdash; delivered alongside asset owners, EPCs and system
-              integrators.
+              New mosaic mimic panels, spares, control and indication
+              components, panel extensions, modifications and legacy system
+              support &mdash; including complete control-room mimic systems
+              built and tested in the UK.
             </p>
           </div>
         </div>
       </div>
 
+      {/* Commented out per client — 4-card catalogue grid was Werner-era
+          product-showcase copy that no longer fits Saltech's engineering-
+          services positioning. Keep in place so we can restore quickly.
       <div className="features__grid">
         {cards.map((c) => (
           <article className="feature-card" key={c.num}>
@@ -81,6 +121,7 @@ export default function FeatureGrid() {
           </article>
         ))}
       </div>
+      */}
     </section>
   );
 }
