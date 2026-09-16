@@ -66,92 +66,48 @@ export default function Animations() {
                                   hidden blocks fade+rise in as a stagger.
                                   Eyebrow + headline stay in place; nothing
                                   is faded OUT. */
-      const hero = document.querySelector(".hero");
+      const hero = document.querySelector<HTMLElement>(".hero");
       if (hero) {
-        // Pre-hide the three second-phase blocks. autoAlpha combines
-        // opacity + visibility so the elements are BOTH invisible AND
-        // out of the accessibility tree during phase 0 — cleaner than
-        // separate opacity/visibility management, and reverses smoothly
-        // with scrub scroll-up.
-        gsap.set([".hero__sub-body", ".hero__credibility", ".hero__cta-row"], {
-          autoAlpha: 0,
-        });
-        // Phase-0 offset — shifts the whole wordmark down by ~22% of its
-        // own height so eyebrow + title sit at viewport centre even though
-        // the (invisible) reveal blocks below still take flex space. On
-        // scroll this animates back to 0 so phase-1 content lands where
-        // its natural flow layout expects it.
-        gsap.set(".hero__wordmark", { yPercent: 22 });
-
-        // Entry — fade the eyebrow + title in on page load.
-        // Image intentionally NOT animated here: any .from() on it would
-        // set an initial scale synchronously, which the scrub timeline
-        // below would then capture as its own start value, permanently
-        // zooming the image. The scrub does the entire image zoom.
-        const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
-        intro
-          .from(".hero__eyebrow", { y: 14, opacity: 0, duration: 0.35 })
-          .from(".hero__title", { y: 40, opacity: 0, duration: 0.6 }, "-=0.15");
-
-        // Pinned scrub timeline. As the user scrolls through the pinned
-        // hero, the background image zooms and the three hidden blocks
-        // reveal in sequence (sub-body → credibility → CTA row). The
-        // eyebrow + headline are NOT touched — they stay put.
+        // Hero phase transition is driven by a DISCRETE class flip
+        // (.hero--phase-1) not a scrubbed timeline. Reasoning:
+        //   - Lenis smooths scroll over 2.4s. Adding a GSAP scrub on
+        //     top compounds smoothing → perceived lag between scroll
+        //     and text state → reads as "delay glitch".
+        //   - CSS transitions are GPU-optimised and run on the
+        //     compositor thread, immune to any main-thread jank.
+        //   - Discrete class flip gives one deterministic fade — no
+        //     scrub-linked interpolation to fight with.
+        // The class flip is driven by the SAME pin ScrollTrigger's
+        // onUpdate — NOT a separate trigger — so its "25% mark"
+        // reliably means "25% into the pin", regardless of pin
+        // spacing math. A separate ScrollTrigger with `top+=25% top`
+        // would compute against the hero's unpinned position, which
+        // could fire AFTER the pin releases.
         gsap.timeline({
           defaults: { ease: "none" },
           scrollTrigger: {
             trigger: ".hero",
             start: "top top",
-            end: "+=100%",
+            end: "+=120%",
             pin: true,
-            // Higher scrub (1.0) blends timeline values over ~1s of
-            // scroll — feels butter-smooth. The phase-0 exit and
-            // phase-1 entry are separated by a full 0.15-timeline gap
-            // (~15vh of scroll) so scrub lag can't cause them to
-            // overlap visually.
-            scrub: 1,
+            scrub: 0.3,
             anticipatePin: 1,
+            onUpdate: (self) => {
+              // Toggle at ~25% pin progress. Small hysteresis (0.22
+              // reverse threshold) prevents rapid on/off flicker if
+              // the user scrolls exactly at the boundary.
+              if (self.progress > 0.25 && !hero.classList.contains("hero--phase-1")) {
+                hero.classList.add("hero--phase-1");
+              } else if (self.progress < 0.22 && hero.classList.contains("hero--phase-1")) {
+                hero.classList.remove("hero--phase-1");
+              }
+            },
           },
-        })
-          // Image scales through the whole scrub — subtle background motion
-          // keeps giving scroll feedback even during the phase-0 hold.
-          .fromTo(".hero__img",
-            { scale: 1 },
-            { scale: 1.15, ease: "power1.inOut", duration: 1 },
-            0
-          )
-          // PHASE-0 EXIT (0.25 → 0.45) — pure opacity cross-fade on
-          // eyebrow + title. No y translate on the children: their
-          // parent .hero__wordmark is shifting during this same window,
-          // so any additional child-level translate would compound and
-          // read as rubber-banding. autoAlpha handles opacity AND
-          // visibility together (elements pop out of layout when fully
-          // faded, no separate .set() needed). fromTo with explicit
-          // start values (autoAlpha 1) so the intro .from() above can't
-          // poison the scrub's captured start state.
-          .fromTo(".hero__eyebrow",
-            { autoAlpha: 1 },
-            { autoAlpha: 0, ease: "power2.inOut", duration: 0.20 },
-            0.25
-          )
-          .fromTo(".hero__title",
-            { autoAlpha: 1 },
-            { autoAlpha: 0, ease: "power2.inOut", duration: 0.20 },
-            0.25
-          )
-          // Wordmark shift runs alongside the fade so the block travels
-          // upward while phase-0 dissolves — but COMPLETES at 0.48,
-          // fully BEFORE phase-1 content starts entering at 0.60. That
-          // means sub-body fades in against a stationary container,
-          // eliminating the compound-motion glitch.
-          .to(".hero__wordmark", { yPercent: -22, ease: "power2.inOut", duration: 0.23 }, 0.25)
-          // PHASE-1 ENTRY (0.60 → 0.98) — pure autoAlpha fades on each
-          // block, no y translation. Wordmark has landed by now, so the
-          // blocks appear against a still container. Staggered so the
-          // eye tracks each in turn (sub-body → credibility → CTA).
-          .to(".hero__sub-body",    { autoAlpha: 1, ease: "power2.out", duration: 0.22 }, 0.60)
-          .to(".hero__credibility", { autoAlpha: 1, ease: "power2.out", duration: 0.22 }, 0.76)
-          .to(".hero__cta-row",     { autoAlpha: 1, ease: "power2.out", duration: 0.22 }, 0.88);
+        }).fromTo(".hero__img",
+          { scale: 1 },
+          { scale: 1.15, ease: "power1.inOut", duration: 1 },
+          0
+        );
       }
 
       /* -------------------------------------------------- REFRAME

@@ -2324,7 +2324,45 @@ button { font: inherit; cursor: pointer; }
   display: flex; flex-direction: column; align-items: center;
   text-align: center;
   width: 100%;
+  /* Phase-0 offset: shifts the block down 22% so eyebrow+title read
+     as viewport-centered even though the (invisible) phase-1 blocks
+     below still take flex space. Phase-1 class removes this. */
+  transform: translateY(22%);
+  transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+  will-change: transform;
 }
+.hero--phase-1 .hero__wordmark { transform: translateY(-22%); }
+
+/* Phase-0 content — visible on page load, fades out on phase flip.
+   Pure opacity transition (no y translate) so it doesn't compound
+   with the wordmark's own transform. */
+.hero__eyebrow,
+.hero__title {
+  opacity: 1;
+  transition: opacity 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+  will-change: opacity;
+}
+.hero--phase-1 .hero__eyebrow,
+.hero--phase-1 .hero__title {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Phase-1 content — hidden by default, staggered fade-in on flip.
+   Transition delays give the "sub-body first, then credibility,
+   then CTAs" cascade without needing per-element JS. */
+.hero__sub-body,
+.hero__credibility,
+.hero__cta-row {
+  opacity: 0;
+  transition: opacity 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+  will-change: opacity;
+  pointer-events: none;
+}
+.hero--phase-1 .hero__sub-body    { opacity: 1; pointer-events: auto; transition-delay: 0.15s; }
+.hero--phase-1 .hero__credibility { opacity: 1; pointer-events: auto; transition-delay: 0.28s; }
+.hero--phase-1 .hero__cta-row     { opacity: 1; pointer-events: auto; transition-delay: 0.40s; }
+
 .hero__title {
   text-align: center; max-width: min(1200px, 94vw);
   font-size: clamp(28px, 4vw, 68px);
