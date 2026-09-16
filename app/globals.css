@@ -2328,18 +2328,20 @@ button { font: inherit; cursor: pointer; }
      as viewport-centered even though the (invisible) phase-1 blocks
      below still take flex space. Phase-1 class removes this. */
   transform: translateY(22%);
-  transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+  transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1);
   will-change: transform;
 }
 .hero--phase-1 .hero__wordmark { transform: translateY(-22%); }
 
 /* Phase-0 content — visible on page load, fades out on phase flip.
    Pure opacity transition (no y translate) so it doesn't compound
-   with the wordmark's own transform. */
+   with the wordmark's own transform. Shorter duration (0.35s)
+   keeps the whole cascade tight so it completes well within the
+   short pin window. */
 .hero__eyebrow,
 .hero__title {
   opacity: 1;
-  transition: opacity 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+  transition: opacity 0.35s cubic-bezier(0.65, 0, 0.35, 1);
   will-change: opacity;
 }
 .hero--phase-1 .hero__eyebrow,
@@ -2348,20 +2350,21 @@ button { font: inherit; cursor: pointer; }
   pointer-events: none;
 }
 
-/* Phase-1 content — hidden by default, staggered fade-in on flip.
-   Transition delays give the "sub-body first, then credibility,
-   then CTAs" cascade without needing per-element JS. */
+/* Phase-1 content — hidden by default, tight staggered fade-in on
+   flip. Total cascade: sub-body at 0.08s → credibility at 0.18s →
+   CTAs at 0.28s, each 0.35s duration. Whole cascade completes in
+   ~0.63s — comfortably inside the pin window. */
 .hero__sub-body,
 .hero__credibility,
 .hero__cta-row {
   opacity: 0;
-  transition: opacity 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+  transition: opacity 0.35s cubic-bezier(0.65, 0, 0.35, 1);
   will-change: opacity;
   pointer-events: none;
 }
-.hero--phase-1 .hero__sub-body    { opacity: 1; pointer-events: auto; transition-delay: 0.15s; }
-.hero--phase-1 .hero__credibility { opacity: 1; pointer-events: auto; transition-delay: 0.28s; }
-.hero--phase-1 .hero__cta-row     { opacity: 1; pointer-events: auto; transition-delay: 0.40s; }
+.hero--phase-1 .hero__sub-body    { opacity: 1; pointer-events: auto; transition-delay: 0.08s; }
+.hero--phase-1 .hero__credibility { opacity: 1; pointer-events: auto; transition-delay: 0.18s; }
+.hero--phase-1 .hero__cta-row     { opacity: 1; pointer-events: auto; transition-delay: 0.28s; }
 
 .hero__title {
   text-align: center; max-width: min(1200px, 94vw);

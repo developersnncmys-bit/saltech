@@ -88,17 +88,23 @@ export default function Animations() {
           scrollTrigger: {
             trigger: ".hero",
             start: "top top",
-            end: "+=120%",
+            // Short pin (+=50%) — just enough scroll to let the CSS
+            // cascade play out (~1s = ~40vh at Lenis speed). Longer
+            // pins create dead-scroll zones where the user is
+            // scrolling but nothing visible is changing, which reads
+            // as "the hero lags for two extra scrolls."
+            end: "+=50%",
             pin: true,
             scrub: 0.3,
             anticipatePin: 1,
             onUpdate: (self) => {
-              // Toggle at ~25% pin progress. Small hysteresis (0.22
-              // reverse threshold) prevents rapid on/off flicker if
-              // the user scrolls exactly at the boundary.
-              if (self.progress > 0.25 && !hero.classList.contains("hero--phase-1")) {
+              // Toggle at ~15% pin progress — responsive: the moment
+              // the user starts scrolling, phase-1 begins revealing.
+              // Small hysteresis (0.12 reverse threshold) prevents
+              // rapid on/off flicker at the boundary.
+              if (self.progress > 0.15 && !hero.classList.contains("hero--phase-1")) {
                 hero.classList.add("hero--phase-1");
-              } else if (self.progress < 0.22 && hero.classList.contains("hero--phase-1")) {
+              } else if (self.progress < 0.12 && hero.classList.contains("hero--phase-1")) {
                 hero.classList.remove("hero--phase-1");
               }
             },
