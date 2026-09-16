@@ -345,7 +345,8 @@ export default function SwitchShowcase() {
     const rearEyebrow = section.querySelector<HTMLElement>(".saltech-cinematic-rear-text__eyebrow");
     const rearTitle   = section.querySelector<HTMLElement>(".saltech-cinematic-rear-text__title");
     const rearBody    = section.querySelector<HTMLElement>(".saltech-cinematic-rear-text__body");
-    const rearChildren: (HTMLElement | null)[] = [rearTag, rearEyebrow, rearTitle, rearBody];
+    const rearCta     = section.querySelector<HTMLElement>(".saltech-cinematic-rear-text__cta");
+    const rearChildren: (HTMLElement | null)[] = [rearTag, rearEyebrow, rearTitle, rearBody, rearCta];
 
     // Explicit progress-0 text state — 3D canvas, caption and rear text
     // all start hidden. The horizontal intro paragraphs also start hidden
@@ -473,6 +474,7 @@ export default function SwitchShowcase() {
       applyRearChild(rearEyebrow, 0.62, 0.70, p);
       applyRearChild(rearTitle,   0.62, 0.70, p);
       applyRearChild(rearBody,    0.66, 0.74, p);
+      applyRearChild(rearCta,     0.70, 0.78, p);
     };
     applyText(0);
 

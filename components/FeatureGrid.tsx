@@ -97,13 +97,19 @@ export default function FeatureGrid() {
               <span className="saltech-cinematic-rear-text__tag-dot" aria-hidden="true" />
               <span className="saltech-cinematic-rear-text__tag-label">Solution 1</span>
             </div>
-            <p className="saltech-cinematic-rear-text__eyebrow">Mosaic Mimic Systems</p>
+            <h3 className="saltech-cinematic-rear-text__title">Mosaic Mimic Systems</h3>
             <p className="saltech-cinematic-rear-text__body">
               New mosaic mimic panels, spares, control and indication
               components, panel extensions, modifications and legacy system
               support &mdash; including complete control-room mimic systems
               built and tested in the UK.
             </p>
+            <a href="#mosaic" className="saltech-cinematic-rear-text__cta">
+              Explore Mosaic Mimic Systems
+              <svg width="14" height="14" viewBox="0 0 12 12" aria-hidden="true">
+                <path d="M2 10 L10 2 M4 2 H10 V8" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </a>
           </div>
         </div>
       </div>

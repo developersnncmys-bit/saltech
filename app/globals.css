@@ -1289,7 +1289,8 @@ button { font: inherit; cursor: pointer; }
 }
 .saltech-cinematic-section .saltech-cinematic-rear-text__eyebrow,
 .saltech-cinematic-section .saltech-cinematic-rear-text__title,
-.saltech-cinematic-section .saltech-cinematic-rear-text__body {
+.saltech-cinematic-section .saltech-cinematic-rear-text__body,
+.saltech-cinematic-section .saltech-cinematic-rear-text__cta {
   opacity: 0;
   transform: translateY(20px);
   will-change: opacity, transform;
@@ -1355,6 +1356,41 @@ button { font: inherit; cursor: pointer; }
   line-height: 1.55;
   letter-spacing: -0.005em;
   will-change: opacity, transform;
+}
+
+/* CTA — arrow link that fades in with the rest of the rear text. Uses
+   the same reveal ramp (SwitchShowcase.tsx applyRearChild) so it lands
+   after the body copy, giving the scene a natural read-then-act rhythm.
+   Opacity/transform start values are set inline by the reveal script;
+   `will-change` hints the compositor. */
+.saltech-cinematic-section .saltech-cinematic-rear-text__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: clamp(20px, 2.6vh, 28px) 0 0;
+  padding: 12px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  font-size: clamp(13px, 0.95vw, 15px);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  transition: background 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.25s var(--ease);
+  pointer-events: auto;
+  will-change: opacity, transform;
+}
+.saltech-cinematic-section .saltech-cinematic-rear-text__cta:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+.saltech-cinematic-section .saltech-cinematic-rear-text__cta svg {
+  flex-shrink: 0;
+  transition: transform 0.25s var(--ease);
+}
+.saltech-cinematic-section .saltech-cinematic-rear-text__cta:hover svg {
+  transform: translate(2px, -2px);
 }
 
 /* Series spec block — restrained right-side data callout.
