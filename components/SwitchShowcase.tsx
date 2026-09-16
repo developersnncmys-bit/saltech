@@ -270,9 +270,7 @@ function SwitchModel({
     if (!wrapperRef.current) return;
     const p = progressRef.current;
     wrapperRef.current.rotation.y = getPose(p).modelRotY;
-    // Graceful exit (0.92 → 1.00): subtle 5% scale recede. No position
-    // change — product stays exactly where it is in viewport, no upward
-    // jump toward the navbar.
+    // Graceful exit (0.92 → 1.00): subtle 5% scale recede.
     const handoff = rampIn(p, 0.92, 1.0);
     wrapperRef.current.scale.setScalar(baseScaleRef.current * (1 - 0.05 * handoff));
   });
@@ -412,17 +410,25 @@ export default function SwitchShowcase() {
     };
 
     const applyText = (p: number) => {
-      // Section headline holds through the paragraph sequence, then
-      // fades out during the 3D-reveal transition (0.50 → 0.62).
+      // Hard visibility gates — driven by RAW scroll progress, not by
+      // the (scrub-lagged) opacity value. This means the moment scroll
+      // crosses the threshold, the pre-reveal text is instantly gone
+      // from the paint pipeline regardless of what GSAP's smoothing is
+      // still tweening. Fixes the visible ghost during the transition.
+      const preRevealHidden = p > 0.51;   // text truly gone at 0.51+
+      const canvasHidden    = p < 0.55;   // canvas truly gone until 0.55
+
       if (eyebrow) {
-        const k = rampIn(p, 0.50, 0.58);
+        const k = rampIn(p, 0.42, 0.50);
         eyebrow.style.opacity = String(1 - k);
         eyebrow.style.transform = `translateX(-50%) translateY(${lerp(0, -10, k)}px)`;
+        eyebrow.style.visibility = preRevealHidden ? "hidden" : "visible";
       }
       if (title) {
-        const k = rampIn(p, 0.50, 0.62);
+        const k = rampIn(p, 0.42, 0.50);
         title.style.opacity = String(1 - k);
         title.style.transform = `translateX(-50%) translateY(${lerp(0, -22, k)}px)`;
+        title.style.visibility = preRevealHidden ? "hidden" : "visible";
       }
       // Caption + 3D canvas — enter together at 0.55 (with a light exit
       // ramp so they leave with the rest of the section at 0.94–1.00).
@@ -432,15 +438,18 @@ export default function SwitchShowcase() {
         caption.style.opacity = String(inK * outK);
       }
       if (canvas) {
-        const inK  = rampIn(p, 0.52, 0.65);
+        // Canvas fade + hard visibility gate. Even if scrub-lag has the
+        // opacity trailing up early, `visibility: hidden` keeps it truly
+        // off-screen until scroll actually crosses 0.55.
+        const inK  = rampIn(p, 0.56, 0.72);
         const outK = rampOut(p, 0.94, 1.00);
         canvas.style.opacity = String(inK * outK);
+        canvas.style.visibility = canvasHidden ? "hidden" : "visible";
       }
 
-      // Horizontal intro paragraphs — stagger in during 0.05 → 0.44,
-      // hold through 0.44 → 0.50, exit together 0.50 → 0.58 so the 3D
-      // canvas can fade in cleanly on empty stage.
-      const introOut = 1 - rampIn(p, 0.50, 0.58);
+      // Horizontal intro paragraphs — stagger in during 0.05 → 0.38, hold
+      // briefly, then exit BY 0.50 so the pre-reveal group leaves together.
+      const introOut = 1 - rampIn(p, 0.42, 0.50);
       const introY = lerp(30, 0, 1 - introOut);
       const paraTimings: [number, number][] = [
         [0.05, 0.14],
@@ -452,6 +461,9 @@ export default function SwitchShowcase() {
         const inK = rampIn(p, t[0], t[1]);
         el.style.opacity = String(inK * introOut);
         el.style.transform = `translateY(${lerp(30, 0, inK) + introY * 0.3}px)`;
+        // Same hard visibility gate as title/eyebrow — instant hide once
+        // scroll crosses 0.51 regardless of the trailing opacity value.
+        el.style.visibility = preRevealHidden ? "hidden" : "visible";
       });
 
       // Rear text (Solution 01 tag → Mosaic Mimic eyebrow → body) — enters
@@ -483,13 +495,17 @@ export default function SwitchShowcase() {
         anticipatePin: 1,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
-          // Camera stages are remapped: the first 55% of scroll is the
-          // paragraph-reveal phase (3D canvas hidden). The camera only
-          // starts moving during the remaining 45% (0.55 → 1.00), giving
-          // it the full stage-1 → stage-7 keyframe sweep even though its
-          // effective progress is compressed.
-          const cameraP = Math.max(0, (self.progress - 0.55) / 0.45);
-          progressRef.current = cameraP;
+          // Camera stages remap: paragraphs run during scroll 0.00→0.55.
+          // The canvas is visibility:hidden during that band (applyText
+          // handles the gate) so any camera motion at low progress is
+          // never seen. We start the camera at stage-3 (side view) so
+          // when the canvas first becomes visible at 0.55, the model is
+          // already at a compositionally-nice angle — then the camera
+          // orbits around through stages 4 → 5 → 6 → 7 as the user
+          // continues to scroll, giving that natural "model rotating on
+          // scroll" feel from the earlier build.
+          const rawT = Math.max(0, (self.progress - 0.55) / 0.45);
+          progressRef.current = 0.32 + rawT * 0.68;
           applyText(self.progress);
         },
       });

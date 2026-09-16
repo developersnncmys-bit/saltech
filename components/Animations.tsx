@@ -68,14 +68,14 @@ export default function Animations() {
                                   is faded OUT. */
       const hero = document.querySelector(".hero");
       if (hero) {
-        // Pre-hide the three second-phase blocks. gsap.set applies inline
-        // styles synchronously on mount so there is no FOUC. When
-        // prefers-reduced-motion is true we hit the early return above and
-        // these never run — meaning reduced-motion users see everything
-        // without needing to scroll. Correct fallback behaviour.
-        gsap.set(".hero__sub-body", { opacity: 0, y: 30 });
-        gsap.set(".hero__credibility", { opacity: 0, y: 24 });
-        gsap.set(".hero__cta-row", { opacity: 0, y: 24 });
+        // Pre-hide the three second-phase blocks. autoAlpha combines
+        // opacity + visibility so the elements are BOTH invisible AND
+        // out of the accessibility tree during phase 0 — cleaner than
+        // separate opacity/visibility management, and reverses smoothly
+        // with scrub scroll-up.
+        gsap.set([".hero__sub-body", ".hero__credibility", ".hero__cta-row"], {
+          autoAlpha: 0,
+        });
         // Phase-0 offset — shifts the whole wordmark down by ~22% of its
         // own height so eyebrow + title sit at viewport centre even though
         // the (invisible) reveal blocks below still take flex space. On
@@ -102,64 +102,56 @@ export default function Animations() {
           scrollTrigger: {
             trigger: ".hero",
             start: "top top",
-            end: "+=80%",
+            end: "+=100%",
             pin: true,
-            // Tight scrub (was 1s smoothing) so the phase-0 → phase-1
-            // transition stays glued to scroll — no lag-window where the
-            // title and sub-body can both be partially visible together.
-            scrub: 0.3,
+            // Higher scrub (1.0) blends timeline values over ~1s of
+            // scroll — feels butter-smooth. The phase-0 exit and
+            // phase-1 entry are separated by a full 0.15-timeline gap
+            // (~15vh of scroll) so scrub lag can't cause them to
+            // overlap visually.
+            scrub: 1,
             anticipatePin: 1,
           },
         })
           // Image scales through the whole scrub — subtle background motion
           // keeps giving scroll feedback even during the phase-0 hold.
-          // fromTo (explicit scale: 1 start) so the scrub doesn't inherit
-          // any transient scale value from earlier in the boot sequence.
           .fromTo(".hero__img",
             { scale: 1 },
             { scale: 1.15, ease: "power1.inOut", duration: 1 },
             0
           )
-          // Phase-0 HOLD (scroll 0 → ~30% of pin): nothing touches the
-          // wordmark; eyebrow + title stay fully visible at viewport centre.
-          // Phase-0 → phase-1 TRANSITION begins at timeline position 0.30.
-          // In phase 1, shift the wordmark UP by ~22% of its own height so
-          // the visible sub-body + credibility + CTA group is centred in the
-          // viewport (the invisible eyebrow+title above still take flex
-          // space and would otherwise push the visible block low).
-          // Wordmark shift completes at 0.50 — BEFORE sub-body starts —
-          // so the container isn't still travelling while phase-1 content
-          // is fading in.
-          .to(".hero__wordmark", { yPercent: -22, ease: "power2.out", duration: 0.20 }, 0.30)
-          // Eyebrow + title fade + LIFT OFF (0.30 → 0.48).
+          // PHASE-0 EXIT (0.25 → 0.45) — pure opacity cross-fade on
+          // eyebrow + title. No y translate on the children: their
+          // parent .hero__wordmark is shifting during this same window,
+          // so any additional child-level translate would compound and
+          // read as rubber-banding. autoAlpha handles opacity AND
+          // visibility together (elements pop out of layout when fully
+          // faded, no separate .set() needed). fromTo with explicit
+          // start values (autoAlpha 1) so the intro .from() above can't
+          // poison the scrub's captured start state.
           .fromTo(".hero__eyebrow",
-            { opacity: 1, y: 0 },
-            { opacity: 0, y: -20, ease: "power2.in", duration: 0.18 },
-            0.30
+            { autoAlpha: 1 },
+            { autoAlpha: 0, ease: "power2.inOut", duration: 0.20 },
+            0.25
           )
           .fromTo(".hero__title",
-            { opacity: 1, y: 0 },
-            { opacity: 0, y: -60, ease: "power2.in", duration: 0.18 },
-            0.30
+            { autoAlpha: 1 },
+            { autoAlpha: 0, ease: "power2.inOut", duration: 0.20 },
+            0.25
           )
-          // Yank title + eyebrow out of the flex flow the moment they're
-          // fully faded. Reserves ZERO space during phase 1, so the
-          // sub-body's 1.6× scale can't accidentally overlap them.
-          // visibility toggles reverse cleanly with scrub scroll-up.
-          .set(".hero__title",   { visibility: "hidden" }, 0.48)
-          .set(".hero__eyebrow", { visibility: "hidden" }, 0.48)
-          // Clean beat of empty stage from 0.48 → 0.56 — nothing visible
-          // in the centre band. Then sub-body enters.
-          .to(".hero__sub-body", {
-            opacity: 1, y: 0,
-            scale: 1.6,
-            transformOrigin: "center center",
-            color: "#ffffff",
-            fontWeight: 700,
-            ease: "power2.out", duration: 0.20,
-          }, 0.56)
-          .to(".hero__credibility", { opacity: 1, y: 0, ease: "power2.out", duration: 0.22 }, 0.78)
-          .to(".hero__cta-row", { opacity: 1, y: 0, ease: "power2.out", duration: 0.22 }, 0.88);
+          // Wordmark shift runs alongside the fade so the block travels
+          // upward while phase-0 dissolves — but COMPLETES at 0.48,
+          // fully BEFORE phase-1 content starts entering at 0.60. That
+          // means sub-body fades in against a stationary container,
+          // eliminating the compound-motion glitch.
+          .to(".hero__wordmark", { yPercent: -22, ease: "power2.inOut", duration: 0.23 }, 0.25)
+          // PHASE-1 ENTRY (0.60 → 0.98) — pure autoAlpha fades on each
+          // block, no y translation. Wordmark has landed by now, so the
+          // blocks appear against a still container. Staggered so the
+          // eye tracks each in turn (sub-body → credibility → CTA).
+          .to(".hero__sub-body",    { autoAlpha: 1, ease: "power2.out", duration: 0.22 }, 0.60)
+          .to(".hero__credibility", { autoAlpha: 1, ease: "power2.out", duration: 0.22 }, 0.76)
+          .to(".hero__cta-row",     { autoAlpha: 1, ease: "power2.out", duration: 0.22 }, 0.88);
       }
 
       /* -------------------------------------------------- REFRAME
