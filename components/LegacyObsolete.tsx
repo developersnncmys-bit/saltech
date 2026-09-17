@@ -98,7 +98,7 @@ export default function LegacyObsolete() {
         <div className="legacy__media" aria-hidden="true">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/legacy.jpg"
+            src="/images/legacy-system.jpg"
             alt=""
             loading="lazy"
           />
