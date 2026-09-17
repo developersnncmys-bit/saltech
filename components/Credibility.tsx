@@ -28,12 +28,13 @@ export default function Credibility() {
         <div className="cred__head">
           <p className="section-eyebrow">Credibility</p>
           <h2 className="cred__title">Organisations we have supported.</h2>
-          <span className="cred__iso" aria-label="ISO 9001:2015 certified">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-              <path d="M12 2 L15 5 L19 5 L19 9 L22 12 L19 15 L19 19 L15 19 L12 22 L9 19 L5 19 L5 15 L2 12 L5 9 L5 5 L9 5 Z" />
-              <path d="M8 12 L11 15 L16 9" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            ISO 9001:2015 Certified
+          <span className="cred__iso" aria-label="ISO 9001:2015 certified quality management system">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logos/ISO.png" alt="" className="cred__iso-badge" loading="lazy" />
+            <span className="cred__iso-text">
+              <span className="cred__iso-text-strong">ISO 9001:2015</span>
+              <span className="cred__iso-text-sub">Certified Quality Management System</span>
+            </span>
           </span>
         </div>
 

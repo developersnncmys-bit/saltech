@@ -93,9 +93,9 @@ export default function WhySaltech() {
             <p className="why__eyebrow">Why Saltech</p>
           </div>
           <h2 className="why__title">
-            <span className="why__title-clip"><span className="why__title-line">FIVE REASONS UK</span></span>
-            <span className="why__title-clip"><span className="why__title-line">ENGINEERING TEAMS</span></span>
-            <span className="why__title-clip"><span className="why__title-line">WORK WITH US.</span></span>
+            <span className="why__title-clip"><span className="why__title-line">WHY ENGINEERING</span></span>
+            <span className="why__title-clip"><span className="why__title-line">TEAMS CHOOSE</span></span>
+            <span className="why__title-clip"><span className="why__title-line">SALTECH.</span></span>
           </h2>
         </aside>
         <ol className="why__list">

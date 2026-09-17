@@ -15,6 +15,8 @@ import Partners from "@/components/Partners";
 import Preloader from "@/components/Preloader";
 import Reframe from "@/components/Reframe";
 import Solutions from "@/components/Solutions";
+import ThinkingSpaceSaltech from "@/components/ThinkingSpaceSaltech";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import WhySaltech from "@/components/WhySaltech";
 
 export default function Page() {
@@ -29,6 +31,7 @@ export default function Page() {
       <ComponentsToSystems />
       <LegacyObsolete />
       <EngineeringUnderOneRoof />
+      <ThinkingSpaceSaltech />
       <WhySaltech />
       <Industries />
       <ManufacturingEngineering />
@@ -37,6 +40,7 @@ export default function Page() {
       <FinalCTA />
       <Footer />
       <GlobalBall />
+      <WhatsAppButton />
       <Animations />
     </>
   );

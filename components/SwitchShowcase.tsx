@@ -79,7 +79,7 @@ const MODEL_INITIAL_ROTATION: [number, number, number] = [0, 0, 0];
 const MODEL_TARGET_SIZE = 2.6;
 // Compressed timeline — every scroll segment produces a visible change,
 // no long stretches of empty black space.
-const SCROLL_DISTANCE_PX = 3200;
+const SCROLL_DISTANCE_PX = 1500;
 const SECTION_SELECTOR = ".saltech-cinematic-section";
 const MODEL_URL = "/models/saltech-switch.gltf";
 
@@ -317,7 +317,7 @@ function RearAccentLight({ progressRef }: { progressRef: MutableRefObject<number
   return <directionalLight ref={ref} position={[0.8, 2.2, -6]} intensity={0.60} color="#FFB8B0" />;
 }
 
-export default function SwitchShowcase() {
+export default function SwitchShowcase({ renderCanvas = true }: { renderCanvas?: boolean } = {}) {
   const progressRef = useRef(0);
   const stRef = useRef<ScrollTrigger | null>(null);
 
@@ -347,23 +347,48 @@ export default function SwitchShowcase() {
     const rearBody    = section.querySelector<HTMLElement>(".saltech-cinematic-rear-text__body");
     const rearCta     = section.querySelector<HTMLElement>(".saltech-cinematic-rear-text__cta");
     const rearChildren: (HTMLElement | null)[] = [rearTag, rearEyebrow, rearTitle, rearBody, rearCta];
+    // Editorial hero container — wraps tag + heading (with inline pill)
+    // + body + CTA. The inline pill inside the heading is the mosaic
+    // image that expands via scroll.
+    const heroWrap  = section.querySelector<HTMLElement>(".saltech-cinematic-hero");
+    const canvasImg = section.querySelector<HTMLElement>(".saltech-cinematic-canvas__img");
+    const staticImage = section.querySelector<HTMLElement>(
+      ".saltech-cinematic-static-image"
+    );
 
-    // Explicit progress-0 text state — 3D canvas, caption and rear text
-    // all start hidden. The horizontal intro paragraphs also start hidden
-    // and reveal in sequence during the pre-reveal phase.
+    // Two-phase reveal:
+    //   Phase 0 (scroll 0.00 → 0.42): "Engineering-led solutions..."
+    //     title + eyebrow visible from start; three intro paragraphs
+    //     stagger in, hold, then exit together.
+    //   Phase 1 (scroll 0.42 → 1.00): Mosaic Mimic hero fades in
+    //     (Solution pill + heading with inline mosaic pill + body +
+    //     CTA), then image expands to fill viewport, then fades out.
+    // Explicit progress-0 state so first paint matches phase 0.
     if (eyebrow) { eyebrow.style.opacity = "1"; eyebrow.style.transform = "translateX(-50%) translateY(0px)"; }
     if (title)   { title.style.opacity   = "1"; title.style.transform   = "translateX(-50%) translateY(0px)"; }
     if (caption) caption.style.opacity = "0";
-    if (canvas)  canvas.style.opacity  = "0";
+    if (canvas) {
+      canvas.style.opacity = renderCanvas ? "0" : "1";
+      canvas.style.visibility = renderCanvas ? "hidden" : "visible";
+    }
     introParas.forEach((el) => {
       el.style.opacity = "0";
       el.style.transform = "translateY(30px)";
     });
+    // Rear-text children stay at opacity 1 — the heroWrap parent
+    // controls visibility. If children are also 0, the multiplication
+    // (parent × child) means they can never show even when heroWrap
+    // fades in.
     rearChildren.forEach((el) => {
       if (!el) return;
-      el.style.opacity = "0";
-      el.style.transform = "translateY(20px)";
+      el.style.opacity = "1";
+      el.style.transform = "translateY(0)";
     });
+    if (heroWrap) heroWrap.style.opacity = "0";
+    if (canvasImg) {
+      canvasImg.style.setProperty("--reveal-scale", "1");
+      canvasImg.style.setProperty("--reveal-radius", "999px");
+    }
 
     // Non-overlapping fades. Hero heading exits with a slight UPWARD lift so
     // the transition reads as intentional rather than passive.
@@ -410,73 +435,110 @@ export default function SwitchShowcase() {
       el.style.transform = `translateY(${lerp(20, 0, inK)}px)`;
     };
 
+    // Max scale for the image expansion — updated by alignImageToPill()
+    // below once real dimensions are known. Declared here (before
+    // applyText) so the closure can safely reference it.
+    const maxScaleRef = { current: 20 };
+
     const applyText = (p: number) => {
-      // Hard visibility gates — driven by RAW scroll progress, not by
-      // the (scrub-lagged) opacity value. This means the moment scroll
-      // crosses the threshold, the pre-reveal text is instantly gone
-      // from the paint pipeline regardless of what GSAP's smoothing is
-      // still tweening. Fixes the visible ghost during the transition.
-      const preRevealHidden = p > 0.51;   // text truly gone at 0.51+
-      const canvasHidden    = p < 0.55;   // canvas truly gone until 0.55
+      // Phase 0 (0.00 → 0.42): features title + eyebrow + 3 intro
+      // paragraphs. Phase 1 (0.42 → 1.00): Mosaic Mimic hero fades in,
+      // then image expands to full viewport, then everything exits.
+      const preRevealHidden = p > 0.42;
+      const canvasHidden    = p < 0.42;
+      if (staticImage) {
+        const imageIn = rampIn(p, 0.42, 0.48);
+
+        staticImage.style.opacity = String(imageIn);
+        staticImage.style.visibility =
+        imageIn > 0 ? "visible" : "hidden";
+    }
 
       if (eyebrow) {
-        const k = rampIn(p, 0.42, 0.50);
+        const k = rampIn(p, 0.34, 0.42);
         eyebrow.style.opacity = String(1 - k);
         eyebrow.style.transform = `translateX(-50%) translateY(${lerp(0, -10, k)}px)`;
         eyebrow.style.visibility = preRevealHidden ? "hidden" : "visible";
       }
       if (title) {
-        const k = rampIn(p, 0.42, 0.50);
+        const k = rampIn(p, 0.34, 0.42);
         title.style.opacity = String(1 - k);
         title.style.transform = `translateX(-50%) translateY(${lerp(0, -22, k)}px)`;
         title.style.visibility = preRevealHidden ? "hidden" : "visible";
       }
-      // Caption + 3D canvas — enter together at 0.55 (with a light exit
-      // ramp so they leave with the rest of the section at 0.94–1.00).
       if (caption) {
-        const inK  = rampIn(p, 0.55, 0.65);
-        const outK = rampOut(p, 0.94, 1.00);
-        caption.style.opacity = String(inK * outK);
+        caption.style.opacity = "0";
       }
       if (canvas) {
-        // Canvas fade + hard visibility gate. Even if scrub-lag has the
-        // opacity trailing up early, `visibility: hidden` keeps it truly
-        // off-screen until scroll actually crosses 0.55.
-        const inK  = rampIn(p, 0.56, 0.72);
-        const outK = rampOut(p, 0.94, 1.00);
-        canvas.style.opacity = String(inK * outK);
-        canvas.style.visibility = canvasHidden ? "hidden" : "visible";
+      // Keep the static mosaic image visible.
+      // The static image is rendered by FeatureGrid when renderCanvas=false.
+        if (renderCanvas) {
+          const inK = rampIn(p, 0.44, 0.54);
+          const outK = rampOut(p, 0.94, 1.00);
+
+          canvas.style.opacity = String(inK * outK);
+           canvas.style.visibility = canvasHidden ? "hidden" : "visible";
+          } else {
+          canvas.style.opacity = "1";
+          canvas.style.visibility = "visible";
+          }
+      }
+      if (canvasImg) {
+        // Three discrete states — no more inline pill:
+        //   pre-reveal (p < 0.42) → hidden
+        //   full (0.42 < p < 0.68) → image fills full viewport
+        //   split (p > 0.68) → image shrinks to LEFT HALF, hero copy
+        //                     re-appears on right (Solution 2 style)
+        const wantFull  = p > 0.42 && p < 0.68;
+        const wantSplit = p > 0.68;
+        const isFull  = canvasImg.classList.contains("is-full");
+        const isSplit = canvasImg.classList.contains("is-split");
+
+        if (wantSplit && !isSplit) {
+          canvasImg.classList.remove("is-full");
+          canvasImg.classList.add("is-split");
+        } else if (wantFull && !isFull) {
+          canvasImg.classList.remove("is-split");
+          canvasImg.classList.add("is-full");
+        } else if (p < 0.42) {
+          canvasImg.classList.remove("is-full", "is-split");
+        }
       }
 
-      // Horizontal intro paragraphs — stagger in during 0.05 → 0.38, hold
-      // briefly, then exit BY 0.50 so the pre-reveal group leaves together.
-      const introOut = 1 - rampIn(p, 0.42, 0.50);
+      // Horizontal intro paragraphs — stagger in during 0.05 → 0.35,
+      // exit together by 0.42 (with the title/eyebrow).
+      const introOut = 1 - rampIn(p, 0.34, 0.42);
       const introY = lerp(30, 0, 1 - introOut);
       const paraTimings: [number, number][] = [
         [0.05, 0.14],
-        [0.16, 0.25],
-        [0.28, 0.38],
+        [0.15, 0.24],
+        [0.25, 0.34],
       ];
       introParas.forEach((el, i) => {
         const t = paraTimings[i] ?? [0, 0];
         const inK = rampIn(p, t[0], t[1]);
         el.style.opacity = String(inK * introOut);
         el.style.transform = `translateY(${lerp(30, 0, inK) + introY * 0.3}px)`;
-        // Same hard visibility gate as title/eyebrow — instant hide once
-        // scroll crosses 0.51 regardless of the trailing opacity value.
         el.style.visibility = preRevealHidden ? "hidden" : "visible";
       });
 
-      // Rear text (Solution 01 tag → Mosaic Mimic eyebrow → body) — enters
-      // WITH the 3D model at 0.58+, staggered so the tag lands first, holds
-      // until section exit.
-      applyRearChild(rearTag,     0.58, 0.66, p);
-      applyRearChild(rearEyebrow, 0.62, 0.70, p);
-      applyRearChild(rearTitle,   0.62, 0.70, p);
-      applyRearChild(rearBody,    0.66, 0.74, p);
-      applyRearChild(rearCta,     0.70, 0.78, p);
+      // Hero (Solution pill + title + body + CTA) only appears in the
+      // SPLIT state — right half of viewport with editorial layout,
+      // alongside the shrunk mosaic image on the left. No centered
+      // inline-pill state anymore.
+      if (heroWrap) {
+        const splitIn = rampIn(p, 0.72, 0.80);
+        heroWrap.style.opacity = String(splitIn);
+        heroWrap.style.pointerEvents = splitIn > 0.5 ? "auto" : "none";
+        if (p > 0.72) heroWrap.classList.add("is-split");
+        else if (p < 0.68) heroWrap.classList.remove("is-split");
+      }
     };
     applyText(0);
+
+    // No pill alignment needed — image goes hidden → full viewport →
+    // left-half via CSS class toggles. Position/size is fully controlled
+    // by .is-full / .is-split rules in globals.css.
 
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -542,14 +604,27 @@ export default function SwitchShowcase() {
 
   const initialCam = KEYFRAMES.stage1_hero.pos;
 
+  // When renderCanvas is false, skip the WebGL Canvas entirely (no 3D model
+  // loaded, no GPU cost) but keep the useEffect above running — that's what
+  // drives the section's pinned scroll timeline, paragraph reveals, and
+  // canvas/rear-text fades. FeatureGrid renders a static mosaic image in
+  // place of the model.
+  if (!renderCanvas) return null;
+
   return (
     <>
       <Canvas
+        className="saltech-cinematic-canvas"
         dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-        camera={{ position: [initialCam[0], initialCam[1], initialCam[2]], fov: 35, near: 0.1, far: 100 }}
-        shadows
-        style={{ width: "100%", height: "100%" }}
+        camera={{
+         position: [initialCam[0], initialCam[1], initialCam[2]],
+         fov: 35,
+         near: 0.1,
+         far: 100
+        }}
+       shadows
+       style={{ width: "100%", height: "100%" }}
       >
         {/* Studio 3-point lighting — KEY from upper-LEFT-front (viewer's left),
             FILL cool from opposite, RIM warm from directly behind.

@@ -72,8 +72,21 @@ export default function FeatureGrid() {
             </p>
           </div>
 
-          <div className="saltech-cinematic-canvas" aria-hidden="true">
-            <SwitchShowcase />
+          <div className="saltech-cinematic-canvas saltech-cinematic-static-image" aria-hidden="true">
+            {/* SwitchShowcase mounted with renderCanvas=false — orchestration
+                only. The mosaic image lives HERE (outside the hero text
+                wrapper) so its opacity is independent of the hero fade —
+                the image stays fully opaque while the surrounding text
+                disappears. Positioned to visually overlap the .title-pill
+                slot in the heading at rest. */}
+            <SwitchShowcase renderCanvas={false} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="saltech-cinematic-canvas__img"
+              src="/images/new-mosaic-mimic.jpg"
+              alt=""
+              
+            />
           </div>
 
           {/* Bottom-right SOLUTIONS caption removed per client. Kept as a
@@ -89,27 +102,40 @@ export default function FeatureGrid() {
           </div>
           */}
 
-          {/* Rear text — reveals with the 3D model. Features the Mosaic
-              Mimic Systems solution copy (the flagship product line the
-              model represents). */}
-          <div className="saltech-cinematic-rear-text" aria-hidden="true">
+          {/* Editorial hero — Touché-style. Solution pill above, then a
+              headline with the mosaic image embedded INLINE between
+              "Mosaic Mimic" and "Systems". Description + Explore CTA
+              below. As user scrolls, the inline pill grows out of its
+              slot via scale-transform and fills the whole section frame;
+              all surrounding text fades out via consumeK in
+              SwitchShowcase.tsx applyText. */}
+          <div className="saltech-cinematic-hero" aria-hidden="true">
             <div className="saltech-cinematic-rear-text__tag">
               <span className="saltech-cinematic-rear-text__tag-dot" aria-hidden="true" />
               <span className="saltech-cinematic-rear-text__tag-label">Solution 1</span>
             </div>
-            <h3 className="saltech-cinematic-rear-text__title">Mosaic Mimic Systems</h3>
-            <p className="saltech-cinematic-rear-text__body">
-              New mosaic mimic panels, spares, control and indication
-              components, panel extensions, modifications and legacy system
-              support &mdash; including complete control-room mimic systems
-              built and tested in the UK.
-            </p>
-            <a href="#mosaic" className="saltech-cinematic-rear-text__cta">
-              Explore Mosaic Mimic Systems
-              <svg width="14" height="14" viewBox="0 0 12 12" aria-hidden="true">
-                <path d="M2 10 L10 2 M4 2 H10 V8" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </a>
+            <h3 className="saltech-cinematic-rear-text__title">
+              Mosaic Mimic{" "}
+              {/* Empty placeholder — reserves inline space in the heading
+                  so text splits either side. The actual mosaic image sits
+                  in the canvas div above, positioned to visually overlap
+                  this slot. Hidden in split layout — the surrounding
+                  spaces ensure "Mosaic Mimic Systems" still reads
+                  correctly without the pill's inline width. */}
+              <span className="saltech-cinematic-rear-text__title-pill" aria-hidden="true" />
+              {" "}Systems
+            </h3>
+            <div className="saltech-cinematic-hero__bottom">
+              <p className="saltech-cinematic-rear-text__body">
+                New mosaic mimic panels, spares, control and indication components, panel extensions, modifications and legacy system support &mdash; including complete control-room mimic systems built and tested in the UK.
+              </p>
+              <a href="#mosaic" className="saltech-cinematic-rear-text__cta">
+                Explore Mosaic Mimic Systems
+                <svg width="14" height="14" viewBox="0 0 12 12" aria-hidden="true">
+                  <path d="M2 10 L10 2 M4 2 H10 V8" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </a>
+            </div>
           </div>
         </div>
       </div>

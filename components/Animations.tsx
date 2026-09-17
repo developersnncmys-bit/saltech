@@ -28,17 +28,19 @@ export default function Animations() {
            duplicate rAF
          - lagSmoothing(0) — disables GSAP's lag compensation so the
            smoothed scroll and the pin timelines stay in perfect sync */
-    // "Butter" mode. Long duration + gentle exponential ease-out
-    // creates the silky glide that feels continuous and smooth.
-    // The exponential curve means the scroll decelerates naturally
-    // over 1.6s instead of stopping abruptly, giving that "coasting"
-    // feel that reads as buttery.
+    // Lerp-based smoothing (frame-locked interpolation) instead of a
+    // long time-based coast. `duration: 2.4` was creating a 2.4s
+    // momentum tail that felt heavy/laggy — the scroll kept moving
+    // after the user stopped, and it took ages to catch up on fast
+    // input. `lerp: 0.1` gives silky-smooth interpolation without a
+    // long overshoot: each frame the scroll position moves 10% closer
+    // to the target, so it always feels responsive to the current
+    // input. `wheelMultiplier: 1` restores natural distance-per-notch.
     const lenis = new Lenis({
-      duration: 2.4,
-      easing: (t: number) => 1 - Math.pow(1 - t, 4),
+      lerp: 0.1,
       smoothWheel: true,
-      wheelMultiplier: 0.55,
-      touchMultiplier: 0.9,
+      wheelMultiplier: 1,
+      touchMultiplier: 1.5,
       syncTouch: true,
     });
     lenis.on("scroll", ScrollTrigger.update);
@@ -68,51 +70,32 @@ export default function Animations() {
                                   is faded OUT. */
       const hero = document.querySelector<HTMLElement>(".hero");
       if (hero) {
-        // Hero phase transition is driven by a DISCRETE class flip
-        // (.hero--phase-1) not a scrubbed timeline. Reasoning:
-        //   - Lenis smooths scroll over 2.4s. Adding a GSAP scrub on
-        //     top compounds smoothing → perceived lag between scroll
-        //     and text state → reads as "delay glitch".
-        //   - CSS transitions are GPU-optimised and run on the
-        //     compositor thread, immune to any main-thread jank.
-        //   - Discrete class flip gives one deterministic fade — no
-        //     scrub-linked interpolation to fight with.
-        // The class flip is driven by the SAME pin ScrollTrigger's
-        // onUpdate — NOT a separate trigger — so its "25% mark"
-        // reliably means "25% into the pin", regardless of pin
-        // spacing math. A separate ScrollTrigger with `top+=25% top`
-        // would compute against the hero's unpinned position, which
-        // could fire AFTER the pin releases.
-        gsap.timeline({
-          defaults: { ease: "none" },
-          scrollTrigger: {
-            trigger: ".hero",
-            start: "top top",
-            // Short pin (+=50%) — just enough scroll to let the CSS
-            // cascade play out (~1s = ~40vh at Lenis speed). Longer
-            // pins create dead-scroll zones where the user is
-            // scrolling but nothing visible is changing, which reads
-            // as "the hero lags for two extra scrolls."
-            end: "+=50%",
-            pin: true,
-            scrub: 0.3,
-            anticipatePin: 1,
-            onUpdate: (self) => {
-              // Toggle at ~15% pin progress — responsive: the moment
-              // the user starts scrolling, phase-1 begins revealing.
-              // Small hysteresis (0.12 reverse threshold) prevents
-              // rapid on/off flicker at the boundary.
-              if (self.progress > 0.15 && !hero.classList.contains("hero--phase-1")) {
-                hero.classList.add("hero--phase-1");
-              } else if (self.progress < 0.12 && hero.classList.contains("hero--phase-1")) {
-                hero.classList.remove("hero--phase-1");
-              }
-            },
-          },
-        }).fromTo(".hero__img",
+        // Full-hero layout: eyebrow, title, supporting body, credibility
+        // bullets and CTA row are ALL visible on load — no phase split,
+        // no pin. Just a light entry stagger for polish and a slow
+        // background image drift on scroll for subtle depth.
+        const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
+        intro
+          .from(".hero__eyebrow",     { y: 14, opacity: 0, duration: 0.4 })
+          .from(".hero__title",       { y: 30, opacity: 0, duration: 0.65 }, "-=0.2")
+          .from(".hero__sub-body",    { y: 20, opacity: 0, duration: 0.55 }, "-=0.35")
+          .from(".hero__credibility", { y: 18, opacity: 0, duration: 0.5 },  "-=0.35")
+          .from(".hero__cta-row",     { y: 18, opacity: 0, duration: 0.5 },  "-=0.35");
+
+        // Background image drift — pure scrub, no pin. Gives the hero
+        // a bit of parallax life as the user starts scrolling.
+        gsap.fromTo(".hero__img",
           { scale: 1 },
-          { scale: 1.15, ease: "power1.inOut", duration: 1 },
-          0
+          {
+            scale: 1.12,
+            ease: "none",
+            scrollTrigger: {
+              trigger: ".hero",
+              start: "top top",
+              end: "bottom top",
+              scrub: 0.3,
+            },
+          }
         );
       }
 
