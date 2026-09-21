@@ -84,6 +84,9 @@ const SOCIAL = [
 export default function Nav() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  // Which parent items in the mobile panel are expanded (accordion state).
+  // Keyed by parent label; reset on panel close.
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -94,10 +97,13 @@ export default function Nav() {
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
+    if (!open) setExpanded({});
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
   const close = () => setOpen(false);
+  const toggleExpanded = (label: string) =>
+    setExpanded((prev) => ({ ...prev, [label]: !prev[label] }));
 
   return (
     <>
@@ -202,28 +208,45 @@ export default function Nav() {
           <span />
         </button>
 
-        <div className="nav__panel" hidden={!open}>
+        <div className="nav__panel" hidden={!open} data-lenis-prevent>
           <ul>
-            {NAV.map((item) => (
-              <li key={item.label}>
-                {item.children ? (
-                  <>
-                    <p className="nav__panel-h">{item.label}</p>
-                    {item.children.map((c) => (
-                      <a key={c.label} href={c.href} onClick={close}>{c.label}</a>
-                    ))}
-                  </>
-                ) : (
-                  <a className="nav__panel-link" href={item.href} onClick={close}>{item.label}</a>
-                )}
-              </li>
-            ))}
+            {NAV.map((item) => {
+              const isOpen = !!expanded[item.label];
+              return (
+                <li key={item.label} className={item.children ? "nav__panel-group" : undefined}>
+                  {item.children ? (
+                    <>
+                      <button
+                        type="button"
+                        className={`nav__panel-toggle${isOpen ? " nav__panel-toggle--open" : ""}`}
+                        aria-expanded={isOpen}
+                        onClick={() => toggleExpanded(item.label)}
+                      >
+                        <span>{item.label}</span>
+                        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+                          <path d="M3 5.5 L7 9.5 L11 5.5" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </button>
+                      {isOpen && (
+                        <div className="nav__panel-children">
+                          {item.children.map((c) => (
+                            <a key={c.label} href={c.href} onClick={close}>{c.label}</a>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <a className="nav__panel-link" href={item.href} onClick={close}>{item.label}</a>
+                  )}
+                </li>
+              );
+            })}
             {SECONDARY.map((item) => (
               <li key={item.label}>
                 <a className="nav__panel-link" href={item.href} onClick={close}>{item.label}</a>
               </li>
             ))}
-            <li>
+            <li className="nav__panel-cta-row">
               <a className="nav__panel-cta" href="#contact" onClick={close}>Request a Quote</a>
             </li>
           </ul>

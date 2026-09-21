@@ -92,6 +92,9 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp01 = (t: number) => (t < 0 ? 0 : t > 1 ? 1 : t);
 const rampIn = (p: number, s: number, e: number) => clamp01((p - s) / (e - s));
 const rampOut = (p: number, s: number, e: number) => 1 - rampIn(p, s, e);
+const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+const easeInOutCubic = (t: number) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
 // Reusable temporaries for slerpPos — avoid per-frame allocations
 const _tmpVA = new THREE.Vector3();
@@ -484,6 +487,14 @@ export default function SwitchShowcase({ renderCanvas = true }: { renderCanvas?:
           }
       }
       if (canvasImg) {
+        // Scroll-scrubbed entry — image opacity 0→1 and scale 0.94→1 ride
+        // an S-curve from progress 0.36 → 0.54 (270px runway) so the image
+        // fades in and grows in lockstep with the scroll wheel instead of
+        // playing a canned CSS transition the moment .is-full toggles.
+        const entryK = easeInOutCubic(rampIn(p, 0.36, 0.54));
+        canvasImg.style.setProperty("--img-opacity", String(entryK));
+        canvasImg.style.setProperty("--img-scale", String(lerp(0.94, 1, entryK)));
+
         // Three discrete states — no more inline pill:
         //   pre-reveal (p < 0.42) → hidden
         //   full (0.42 < p < 0.68) → image fills full viewport
@@ -505,20 +516,22 @@ export default function SwitchShowcase({ renderCanvas = true }: { renderCanvas?:
         }
       }
 
-      // Horizontal intro paragraphs — stagger in during 0.05 → 0.35,
-      // exit together by 0.42 (with the title/eyebrow).
+      // Horizontal intro paragraphs — cascade in during 0.02 → 0.32 with
+      // wide overlapping windows and an S-curve ease so each reveal feels
+      // unhurried. All three exit together by 0.42 with a slight upward
+      // lift (matches the title/eyebrow exit).
       const introOut = 1 - rampIn(p, 0.34, 0.42);
-      const introY = lerp(30, 0, 1 - introOut);
+      const exitK = 1 - introOut;
       const paraTimings: [number, number][] = [
-        [0.05, 0.14],
-        [0.15, 0.24],
-        [0.25, 0.34],
+        [0.02, 0.16],
+        [0.10, 0.24],
+        [0.18, 0.32],
       ];
       introParas.forEach((el, i) => {
         const t = paraTimings[i] ?? [0, 0];
-        const inK = rampIn(p, t[0], t[1]);
-        el.style.opacity = String(inK * introOut);
-        el.style.transform = `translateY(${lerp(30, 0, inK) + introY * 0.3}px)`;
+        const easedIn = easeInOutCubic(rampIn(p, t[0], t[1]));
+        el.style.opacity = String(easedIn * introOut);
+        el.style.transform = `translateY(${lerp(30, 0, easedIn) + lerp(0, -10, exitK)}px)`;
         el.style.visibility = preRevealHidden ? "hidden" : "visible";
       });
 

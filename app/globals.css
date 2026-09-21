@@ -1322,37 +1322,40 @@ button { font: inherit; cursor: pointer; }
   max-width: none;
   object-fit: cover;
   border-radius: 0;
-  transform: translate(-50%, -50%) scale(0.85);
+  transform: translate(-50%, -50%) scale(var(--img-scale, 0.94));
   transform-origin: center center;
   pointer-events: none;
   will-change: transform, opacity, width, left;
-  opacity: 0;
+  opacity: var(--img-opacity, 0);
   z-index: 4;
-  transition: transform 0.8s cubic-bezier(0.7, 0, 0.2, 1),
-              opacity 0.5s cubic-bezier(0.7, 0, 0.2, 1),
-              width 0.8s cubic-bezier(0.7, 0, 0.2, 1),
+  /* Opacity + transform are scroll-scrubbed via CSS vars — no CSS transitions
+     on them. Width/height/top/left still transition for the discrete is-full
+     → is-split layout change at scroll ~0.68. */
+  transition: width 0.8s cubic-bezier(0.7, 0, 0.2, 1),
               height 0.8s cubic-bezier(0.7, 0, 0.2, 1),
               top 0.8s cubic-bezier(0.7, 0, 0.2, 1),
               left 0.8s cubic-bezier(0.7, 0, 0.2, 1);
 }
-/* Full state — image fills the entire section viewport. */
+/* Full state — image fills the entire section viewport. Opacity + scale come
+   from --img-opacity / --img-scale so the entry scrubs with scroll. */
 .saltech-cinematic-section .saltech-cinematic-canvas__img.is-full {
   width: 100vw;
   height: 100vh;
   top: 50%;
   left: 50%;
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
 }
-/* Split state — image flush against LEFT screen edge (top-left anchored),
-   half viewport wide, full viewport tall. Hero text sits in the right half. */
+/* Split state — image occupies the LEFT half of the viewport. Kept
+   centre-anchored via translate(-50%, -50%) so the transform matches the
+   full/default states — otherwise the anchor would snap instantly to
+   top-left while `left` transitions slowly, causing a mid-transition
+   drift into the bottom-right. Left = 25% places the image centre at
+   25vw, i.e. the middle of the left half. Hero text sits in the right
+   half. */
 .saltech-cinematic-section .saltech-cinematic-canvas__img.is-split {
   width: 50vw;
   height: 100vh;
-  top: 0;
-  left: 0;
-  opacity: 1;
-  transform: none;
+  top: 50%;
+  left: 25%;
 }
 /* Keep Mosaic image visible when hero enters split layout */
 
@@ -4227,7 +4230,11 @@ button { font: inherit; cursor: pointer; }
 /* ------------------ RESPONSIVE — TAIL ------------------ */
 
 @media (max-width: 900px) {
-  .hero__center { align-self: end; }
+  /* Center the hero content vertically instead of pinning to the bottom.
+     `align-self: end` worked on landscape/short-viewport phones but on
+     iPad Mini and portrait tablets it stranded the whole content stack
+     in the lower half of a tall viewport. */
+  .hero__center { align-self: center; }
   .intro,
   .solutions,
   .cts,
@@ -4326,3 +4333,452 @@ button { font: inherit; cursor: pointer; }
 
 @media (max-width: 1000px) { .partners__grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 500px)  { .partners__grid { grid-template-columns: 1fr; } }
+
+/* ============================================================
+   V2 MOBILE OPTIMIZATION — comprehensive tuning for all sections
+   Design-only: no copy changes. Hides the Solutions scroll-marker
+   pill on mobile; tightens paddings, headings, list rows, cards and
+   CTAs at 900 / 640 / 480 breakpoints so every section reads well
+   from tablet down to a small phone.
+   ============================================================ */
+
+/* NAV BURGER PANEL — fires at the same breakpoint the burger appears
+   (1399px).
+
+   CRITICAL: `.nav` has `will-change: transform` for the desktop slide-
+   under-utility-bar animation. Per CSS spec, `will-change: transform`
+   establishes a containing block for `position: fixed` descendants — so
+   the panel's `position: fixed; inset: 0` was being clipped to the nav
+   bar's own ~60px box, not the viewport. Result: only the top strip of
+   the panel rendered and the rest was clipped out (looked like a broken
+   half-transparent overlay showing the hero underneath).
+
+   Fix: on mobile the slide animation isn't used anyway (utility bar is
+   `display: none` and nav sits at `top: 0` statically), so we override
+   `will-change: auto` on `.nav` to remove the containing block. */
+@media (max-width: 1399px) {
+  /* Both `will-change: transform` AND `backdrop-filter` create a
+     containing block for position: fixed descendants. Remove both on
+     mobile so the panel can escape to the viewport. Solid white bg
+     replaces the blur (backdrop-filter is only useful on desktop where
+     the nav floats over content). */
+  .nav {
+    will-change: auto;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--white);
+  }
+  .nav__panel {
+    position: fixed;
+    inset: 0;
+    top: 60px;
+    z-index: 150;
+    background: #0a0a0a;
+    color: #ffffff;
+    padding: 28px var(--gutter) 40px;
+    /* Force the panel to scroll internally when its content (expanded
+       accordions + secondary links + CTA) exceeds viewport height. Bound
+       the height explicitly; `overscroll-behavior: contain` stops rubber-
+       band scroll from leaking to the page under it; `touch-action: pan-y`
+       lets touch drag scroll the panel even when Lenis is active. */
+    height: calc(100vh - 60px);
+    max-height: calc(100dvh - 60px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav__panel ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .nav__panel li {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .nav__panel a {
+    color: #ffffff;
+    font-size: 18px;
+    padding: 4px 0;
+    text-decoration: none;
+  }
+  .nav__panel-link {
+    display: block;
+    padding: 12px 0 !important;
+    font-size: 18px !important;
+    font-weight: 600;
+    color: #ffffff !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .nav__panel-h {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  /* The CTA sits in its own `<li class="nav__panel-cta-row">`. Override
+     the generic flex-column .nav__panel li rule to a centered block
+     container so the anchor inside can center via text-align regardless
+     of parent flex quirks. */
+  .nav__panel .nav__panel-cta-row {
+    display: block;
+    text-align: center;
+    padding: 8px 0 0;
+    border: 0;
+  }
+  .nav__panel .nav__panel-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    margin: 24px auto 0;
+    padding: 14px 32px;
+    background: var(--brand-red);
+    color: #ffffff !important;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    white-space: nowrap;
+    border-bottom: 0 !important;
+  }
+
+  /* Accordion toggle button for parent items with children */
+  .nav__panel-group { gap: 0; }
+  .nav__panel-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 0;
+    background: transparent;
+    border: 0;
+    color: #ffffff;
+    font: inherit;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .nav__panel-toggle svg {
+    flex-shrink: 0;
+    color: rgba(255, 255, 255, 0.6);
+    transition: transform 0.25s var(--ease);
+  }
+  .nav__panel-toggle--open svg { transform: rotate(180deg); }
+  .nav__panel-toggle--open { color: #ffffff; }
+  .nav__panel-children {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 0 16px 12px;
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+    margin-left: 4px;
+    margin-top: 6px;
+  }
+  .nav__panel-children a {
+    font-size: 15px !important;
+    color: rgba(255, 255, 255, 0.75) !important;
+    padding: 8px 0 !important;
+  }
+  .nav__panel-children a:hover,
+  .nav__panel-children a:active { color: #ffffff !important; }
+}
+
+@media (max-width: 900px) {
+  /* SOLUTIONS — hide persistent .sol-marker scroll pill on mobile */
+  .sol-marker { display: none !important; }
+
+  /* FEATUREGRID — hide the "Solution 1" tag pill inside the cinematic
+     hero on mobile; the pinned scroll-driven layout has no room for it. */
+  .saltech-cinematic-section .saltech-cinematic-rear-text__tag {
+    display: none !important;
+  }
+
+  /* FEATUREGRID titles — remove nowrap so long headlines wrap into
+     multiple lines instead of overflowing the viewport. Font tightened
+     so the wrapped title stays to 2–3 lines instead of stacking to 5. */
+  .saltech-cinematic-section .features__title,
+  .saltech-cinematic-section .saltech-cinematic-rear-text__title {
+    white-space: normal;
+    max-width: 92vw;
+    text-wrap: balance;
+    word-break: break-word;
+  }
+  .saltech-cinematic-section .features__title {
+    font-size: clamp(20px, 4.6vw, 30px);
+    line-height: 1.1;
+    top: clamp(96px, 12vh, 130px);
+  }
+
+  /* FEATUREGRID intro paragraphs — position from top (not centered) so
+     they sit clearly below the wrapped title instead of overlapping it.
+     Text centered to match the section's centered vertical rhythm on
+     mobile (title + eyebrow + paragraphs all read as one centered stack). */
+  .saltech-cinematic-section .features__intro {
+    top: clamp(260px, 38vh, 340px);
+    transform: translateX(-50%);
+    max-height: 52vh;
+    text-align: center;
+  }
+  .saltech-cinematic-section .features__intro-para {
+    text-align: center;
+    max-width: 40ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+
+  /* FEATUREGRID split-layout hero — collapses to full-width on mobile so
+     the 50vw right-column layout doesn't crush the copy into a strip.
+     Everything centers (title, body, CTA) so the layout reads as one
+     balanced block instead of a mix of left-aligned copy and a stray
+     centered pill button.
+
+     grid-template-rows overridden from `1fr auto 1fr` (which centers the
+     title in the viewport and leaves a big empty 1fr band between title
+     and body) to `auto auto auto` + `align-content: center` so the title,
+     body and CTA sit together as one tight block. */
+  .saltech-cinematic-section .saltech-cinematic-hero.is-split {
+    left: 0;
+    width: 100vw;
+    padding: clamp(40px, 6vh, 72px) var(--gutter);
+    justify-items: center;
+    text-align: center;
+    grid-template-rows: auto auto auto;
+    align-content: center;
+    row-gap: clamp(18px, 2.6vh, 28px);
+  }
+  .saltech-cinematic-section .saltech-cinematic-hero.is-split
+    .saltech-cinematic-hero__bottom {
+    margin-top: 0;
+    gap: clamp(16px, 2.2vh, 24px);
+  }
+  .saltech-cinematic-section .saltech-cinematic-hero.is-split
+    > .saltech-cinematic-rear-text__title {
+    font-size: clamp(24px, 5vw, 34px);
+    text-align: center;
+  }
+  .saltech-cinematic-section .saltech-cinematic-hero.is-split
+    .saltech-cinematic-hero__bottom {
+    align-items: center;
+    text-align: center;
+  }
+  .saltech-cinematic-section .saltech-cinematic-hero.is-split
+    .saltech-cinematic-rear-text__body {
+    text-align: center;
+    max-width: 100%;
+  }
+  /* Split-layout image — take full width behind the copy on mobile so it
+     doesn't sit awkwardly at 25% left with the text overlapping. */
+  .saltech-cinematic-section .saltech-cinematic-canvas__img.is-split {
+    width: 100vw;
+    left: 50%;
+    opacity: 0.35;
+  }
+  /* CTA sits center within the centered hero__bottom column */
+  .saltech-cinematic-section .saltech-cinematic-rear-text__cta {
+    align-self: center;
+  }
+
+  /* SOLUTIONS — head switches to left-aligned single column so the
+     right-aligned title doesn't strand awkwardly on narrow screens */
+  .solutions__head {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 20px;
+  }
+  .solutions__head .solutions__title {
+    text-align: left; margin-left: 0; max-width: 100%;
+  }
+
+  /* SOLUTIONS scenes — content padding was 100–280px on the left
+     (to make room for the pill). Reset to normal gutter on mobile. */
+  .sol-scene__content {
+    padding: clamp(32px, 5vh, 48px) var(--gutter);
+    gap: 16px;
+  }
+  .sol-scene__title { font-size: clamp(22px, 4.6vw, 32px); }
+  .sol-scene__body { font-size: 15px; }
+
+  /* FINAL CTA — card + buttons tighten */
+  .final__card { padding: 26px 22px; border-radius: 18px; }
+  .final__btn { padding: 0 20px; height: 46px; font-size: 12px; }
+
+  /* MANUFACTURING — kinetic word-title gaps, card padding compact */
+  .mfg__title { gap: 0.1em 0.18em; }
+  .mfg__card { min-height: auto; padding: 28px 22px; }
+  .mfg__card-head { margin-bottom: 32px; }
+
+  /* PARTNERS — logo cell tightening */
+  .partners__cell { min-height: 110px; padding: 22px; }
+
+  /* CREDIBILITY — head wraps + iso badge sits left */
+  .cred__head { align-items: flex-start; }
+
+  /* HERO credibility bullets — on mobile the wrapped text was pushing the
+     centered dot to look like it sat on its own line above the copy.
+     Anchor the dot to the first text line (flex-start), cap each row so
+     the text wraps at a comfortable width, and left-align the text inside
+     each row while the whole list stays centered within the section. */
+  .hero__credibility {
+    align-items: center;
+    max-width: 480px;
+    padding: 0 var(--gutter);
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hero__credibility li {
+    align-items: flex-start;
+    text-align: left;
+    line-height: 1.5;
+    max-width: 100%;
+  }
+  .hero__credibility-dot {
+    margin-top: 7px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Consistent vertical rhythm for every V2 section on small phones */
+  .solutions, .cts, .legacy, .euor, .why, .industries, .mfg, .partners, .cred {
+    padding: clamp(56px, 9vh, 80px) 0;
+  }
+  .final { padding: clamp(56px, 9vh, 80px) var(--gutter); }
+  .mfg { padding-top: clamp(64px, 10vh, 96px); }
+
+  /* Section display headings — scale down further on narrow phones */
+  .solutions__title { font-size: clamp(20px, 6vw, 28px); }
+  .cts__title { font-size: clamp(28px, 8vw, 42px); }
+  .legacy__title { font-size: clamp(22px, 7vw, 34px); }
+  .euor__title { font-size: clamp(26px, 8vw, 40px); }
+  .why__title { font-size: clamp(26px, 8vw, 40px); }
+  .industries__title { font-size: clamp(28px, 8vw, 42px); }
+  .mfg__title { font-size: clamp(26px, 8vw, 42px); }
+  .partners__title { font-size: clamp(24px, 7vw, 36px); }
+  .cred__title { font-size: clamp(22px, 6vw, 32px); }
+  .final__title { font-size: clamp(22px, 6.4vw, 32px); }
+
+  /* SOLUTIONS scenes — smaller media + copy on very narrow */
+  .sol-scene__media { aspect-ratio: 4 / 3; }
+  .sol-scene__title { font-size: clamp(20px, 5.4vw, 26px); }
+  .sol-scene__body { font-size: 14px; }
+  .sol-scene__cta { font-size: 12px; }
+
+  /* CTS timeline — smaller node + type on phone */
+  .cts__waypoint-node { width: 20px; height: 20px; }
+  .cts__waypoint-node-inner { width: 6px; height: 6px; }
+  .cts__waypoint-title { font-size: clamp(16px, 4.6vw, 20px); }
+  .cts__waypoint-body-text { font-size: 13px; }
+  .cts__timeline { padding-left: 26px; }
+
+  /* LEGACY — list rows compact */
+  .legacy__list li {
+    grid-template-columns: 36px 1fr;
+    gap: 14px;
+    padding: 14px 0;
+    font-size: 13px;
+  }
+  .legacy__list-idx { font-size: 15px; }
+  .legacy__body { font-size: 14px; }
+
+  /* EUOR — item padding compact, body smaller */
+  .euor-item { padding: 24px 0 28px; }
+  .euor-item__title { font-size: clamp(17px, 5vw, 22px); }
+  .euor-item__body { font-size: 13px; }
+  .euor__sub { font-size: 14px; }
+  .euor-item__icon { margin-bottom: 20px; }
+
+  /* WHY SALTECH — number column narrower, body smaller */
+  .why-item__h { font-size: clamp(16px, 4.6vw, 20px); }
+  .why-item__b { font-size: 13px; }
+  .why__aside { position: static; }
+
+  /* INDUSTRIES — cell padding + text scale */
+  .industries__cell { min-height: 160px; padding: 22px 18px; }
+  .industries__cell-name { font-size: clamp(16px, 4.8vw, 22px); }
+  .industries__cell-tags { font-size: 12px; }
+  .industries__body { font-size: 14px; }
+
+  /* MANUFACTURING — card content compact, eyebrow row spacing */
+  .mfg__card-h { font-size: clamp(16px, 4.6vw, 20px); }
+  .mfg__card-v { font-size: 13px; }
+  .mfg__card-num { font-size: clamp(24px, 7vw, 34px); }
+  .mfg__body { font-size: 14px; }
+  .mfg__eyebrow-row { padding-bottom: clamp(28px, 5vh, 40px); gap: 14px; }
+
+  /* PARTNERS — logo cell smaller */
+  .partners__cell { min-height: 92px; padding: 18px; }
+  .partners__cell-logo { max-width: 120px; max-height: 60px; }
+  .partners__sub, .partners__body { font-size: 14px; }
+
+  /* CREDIBILITY — cell aspect ratio + smaller logos */
+  .cred__cell { aspect-ratio: 4 / 3; padding: 14px; }
+  .cred__cell img { max-width: 72px; max-height: 26px; }
+  .cred__iso { padding: 8px 12px 8px 10px; gap: 10px; }
+  .cred__iso-badge { height: 36px; }
+  .cred__iso-text-strong { font-size: 12px; }
+  .cred__iso-text-sub { font-size: 10px; }
+
+  /* FINAL CTA — full-width tap targets on very narrow screens */
+  .final__cta-row { flex-direction: column; align-items: stretch; gap: 12px; }
+  .final__btn { width: 100%; height: 48px; }
+  .final__card-title { font-size: 20px; }
+  .final__card-body { font-size: 14px; }
+  .final__card-btn { padding: 13px 18px; font-size: 13px; }
+  .final__body { font-size: 14px; }
+
+  /* FOOTER — CTA button full-width, top grid tighter */
+  .footer__cta-btn { width: 100%; }
+  .footer__logo-img { height: 34px; }
+}
+
+/* Tablet portrait (641–900px) — viewport is tall enough that anchoring
+   the FeatureGrid intro from a fixed top offset (from the ≤900px block
+   above) leaves a huge empty band at the bottom. Re-center vertically
+   for this range; the title's own top offset reserves enough space
+   above so there's no collision at this width. */
+@media (min-width: 641px) and (max-width: 900px) {
+  .saltech-cinematic-section .features__intro {
+    top: 55%;
+    transform: translate(-50%, -50%);
+    max-height: 60vh;
+  }
+  .saltech-cinematic-section .features__title {
+    font-size: clamp(28px, 4.4vw, 44px);
+  }
+}
+
+@media (max-width: 480px) {
+  /* Very small phones — logo/nav shrink and lists tighten further */
+  .nav__logo-img { height: 24px; }
+  .nav__panel { padding: 24px var(--gutter) 40px; }
+
+  /* SOLUTIONS scene image aspect wider so text isn't pushed too far down */
+  .sol-scene__media { aspect-ratio: 3 / 2; }
+
+  /* WHY items single-line index + heading */
+  .why-item {
+    grid-template-columns: 40px 1fr;
+    gap: 14px;
+    padding: 22px 0 24px;
+  }
+  .why-item__num { font-size: 24px; }
+
+  /* INDUSTRIES — collapse to 1 col already at 400px; tighten more */
+  .industries__cell { padding: 20px 16px; min-height: 150px; }
+
+  /* MANUFACTURING — remove decorative bg grid weight on small phones */
+  .mfg__bg-grid { background-size: 48px 48px; }
+}

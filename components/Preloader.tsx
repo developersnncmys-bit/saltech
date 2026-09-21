@@ -73,11 +73,6 @@ export default function Preloader() {
           <span className="preloader__count-num">{progress}</span>
         </div>
 
-        {/* Bottom-right locale */}
-        <div className="preloader__corner preloader__corner--br">
-          <span>MYSORE &middot; ISTANBUL</span>
-        </div>
-
         {/* Center mark */}
         <div className="preloader__mark-wrap">
           {/* eslint-disable-next-line @next/next/no-img-element */}

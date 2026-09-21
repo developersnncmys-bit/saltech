@@ -1,3 +1,5 @@
+"use client";
+
 const HEADLINE =
   "Engineering support designed to perform today — and over decades.";
 const DESCRIPTION =
@@ -8,15 +10,16 @@ const CARD_BODY =
 const CARD_CAPTION =
   "Open WhatsApp directly from this CTA to send photographs of an existing panel or component in seconds.";
 
-const WHATSAPP_NUMBER = "919538492009";
+// TODO: set the WhatsApp number (country code + number, no "+" or spaces) to enable the CTA.
+const WHATSAPP_NUMBER = "";
 const WHATSAPP_PREFILL =
   "Hi Saltech, I'd like to send panel photos for a mosaic / legacy system enquiry.";
 
 export default function FinalCTA() {
   const words = HEADLINE.split(/\s+/);
-  const waHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    WHATSAPP_PREFILL
-  )}`;
+  const waHref = WHATSAPP_NUMBER
+    ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_PREFILL)}`
+    : "";
 
   return (
     <section className="final" id="contact">
@@ -58,9 +61,11 @@ export default function FinalCTA() {
               Send Panel Photos
             </a>
             <a
-              href={waHref}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={WHATSAPP_NUMBER ? waHref : "#"}
+              target={WHATSAPP_NUMBER ? "_blank" : undefined}
+              rel={WHATSAPP_NUMBER ? "noopener noreferrer" : undefined}
+              onClick={WHATSAPP_NUMBER ? undefined : (e) => e.preventDefault()}
+              aria-disabled={WHATSAPP_NUMBER ? undefined : true}
               className="final__card-btn final__card-btn--whatsapp"
             >
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

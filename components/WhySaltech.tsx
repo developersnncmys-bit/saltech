@@ -40,30 +40,61 @@ export default function WhySaltech() {
     const root = rootRef.current;
 
     const ctx = gsap.context(() => {
-      const eyebrow = root.querySelector(".why__eyebrow");
-      const titleLines = root.querySelectorAll(".why__title-line");
+      const eyebrow = root.querySelector<HTMLElement>(".why__eyebrow");
+      const titleLines = root.querySelectorAll<HTMLElement>(".why__title-line");
       const items = root.querySelectorAll<HTMLElement>(".why-item");
 
-      gsap.set(eyebrow, { yPercent: 130, opacity: 0 });
-      gsap.set(titleLines, { yPercent: 105, opacity: 0 });
-      gsap.set(items, { y: 60, opacity: 0 });
-
-      const headTl = gsap.timeline({
-        defaults: { ease: "power3.out" },
-        scrollTrigger: { trigger: root, start: "top 75%", once: true },
-      });
-      headTl
-        .to(eyebrow, { yPercent: 0, opacity: 1, duration: 0.55 })
-        .to(titleLines, { yPercent: 0, opacity: 1, duration: 0.95, stagger: 0.08 }, "-=0.3");
+      // Head reveal — eyebrow slides up out of its clip, then the three
+      // title lines stagger in. gsap.from() with an inline scrollTrigger
+      // applies the initial hidden state synchronously (immediateRender)
+      // so there's no flash of visible content, and holds the tween
+      // paused until the trigger fires — more robust under Lenis +
+      // preloader + strict-mode double-mount than a pre-set + timeline
+      // pattern where the set and the tween can decouple.
+      if (eyebrow) {
+        gsap.from(eyebrow, {
+          yPercent: 130,
+          opacity: 0,
+          duration: 0.55,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: root,
+            start: "top 85%",
+            once: true,
+            invalidateOnRefresh: true,
+          },
+        });
+      }
+      if (titleLines.length) {
+        gsap.from(titleLines, {
+          yPercent: 105,
+          opacity: 0,
+          duration: 0.95,
+          stagger: 0.08,
+          ease: "power3.out",
+          delay: 0.25,
+          scrollTrigger: {
+            trigger: root,
+            start: "top 85%",
+            once: true,
+            invalidateOnRefresh: true,
+          },
+        });
+      }
 
       items.forEach((item, i) => {
-        gsap.to(item, {
-          y: 0,
-          opacity: 1,
+        gsap.from(item, {
+          y: 60,
+          opacity: 0,
           duration: 0.85,
           ease: "power3.out",
-          delay: i * 0.08,
-          scrollTrigger: { trigger: item, start: "top 88%", once: true },
+          delay: i * 0.05,
+          scrollTrigger: {
+            trigger: item,
+            start: "top 90%",
+            once: true,
+            invalidateOnRefresh: true,
+          },
         });
 
         const num = item.querySelector<HTMLElement>(".why-item__num");
@@ -80,6 +111,14 @@ export default function WhySaltech() {
         item.addEventListener("mouseenter", enter);
         item.addEventListener("mouseleave", leave);
       });
+
+      // After all triggers are registered, force a refresh so their
+      // start/end positions are recalculated against the FINAL page
+      // layout (Preloader has just released body scroll, fonts may
+      // have finished loading, images resolved). Without this the
+      // triggers can cache stale positions from mount-time and either
+      // fire before elements are painted or never fire at all.
+      requestAnimationFrame(() => ScrollTrigger.refresh());
     }, root);
 
     return () => ctx.revert();

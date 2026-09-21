@@ -1,17 +1,23 @@
 "use client";
 
-const WHATSAPP_NUMBER = "919538492009";
+// TODO: set the WhatsApp number (country code + number, no "+" or spaces) to enable the FAB.
+const WHATSAPP_NUMBER = "";
 const PREFILL =
   "Hi Saltech, I'd like to discuss a panel / system requirement.";
 
 export default function WhatsAppButton() {
-  const href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(PREFILL)}`;
+  const isLinked = Boolean(WHATSAPP_NUMBER);
+  const href = isLinked
+    ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(PREFILL)}`
+    : "#";
 
   return (
     <a
       href={href}
-      target="_blank"
-      rel="noopener noreferrer"
+      target={isLinked ? "_blank" : undefined}
+      rel={isLinked ? "noopener noreferrer" : undefined}
+      onClick={isLinked ? undefined : (e) => e.preventDefault()}
+      aria-disabled={isLinked ? undefined : true}
       className="whatsapp-fab"
       aria-label="Chat with Saltech on WhatsApp"
     >

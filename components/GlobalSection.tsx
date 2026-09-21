@@ -1,3 +1,8 @@
+"use client";
+
+// TODO: set the WhatsApp number (country code + number, no "+" or spaces) to enable the CTA.
+const WHATSAPP_NUMBER = "";
+
 export default function GlobalSection() {
   return (
     <section className="global" id="contact">
@@ -15,7 +20,12 @@ export default function GlobalSection() {
             market.
           </p>
           <div className="global__cta">
-            <a href="https://wa.me/919538492009" className="btn btn--light">
+            <a
+              href={WHATSAPP_NUMBER ? `https://wa.me/${WHATSAPP_NUMBER}` : "#"}
+              onClick={WHATSAPP_NUMBER ? undefined : (e) => e.preventDefault()}
+              aria-disabled={WHATSAPP_NUMBER ? undefined : true}
+              className="btn btn--light"
+            >
               WhatsApp us
             </a>
             <a href="mailto:info@saltech.com" className="global__link">
