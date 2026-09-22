@@ -1245,7 +1245,7 @@ button { font: inherit; cursor: pointer; }
    Absolute-centred; each paragraph is a column in a 3-col grid. */
 .saltech-cinematic-section .features__intro {
   position: absolute;
-  top: 62%;
+  top: 72%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 4;
@@ -1258,7 +1258,7 @@ button { font: inherit; cursor: pointer; }
 }
 .saltech-cinematic-section .features__intro-para {
   margin: 0;
-  font-size: clamp(11px, 0.78vw, 13px);
+  font-size: clamp(14px, 1.05vw, 17px);
   font-weight: 500;
   color: rgba(255, 255, 255, 0.72);
   line-height: 1.6;
@@ -2024,6 +2024,38 @@ button { font: inherit; cursor: pointer; }
 .footer__logo-wrap { display: inline-flex; align-items: center; }
 .footer__logo-img { height: 40px; width: auto; display: block; }
 .footer__tag { margin: 0; font-size: 14px; color: var(--muted); max-width: 300px; line-height: 1.6; }
+.footer__cert {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  line-height: 1.5;
+  max-width: 320px;
+}
+.footer__cert span { margin: 0 6px; color: var(--muted); }
+.footer__cert-badge {
+  display: block;
+  height: auto;
+  width: clamp(140px, 14vw, 180px);
+  margin-top: 4px;
+}
+.footer__vat {
+  display: inline-block;
+  margin-left: 8px;
+  padding-left: 12px;
+  border-left: 1px solid var(--line);
+  color: var(--ink);
+  font-weight: 500;
+}
+@media (max-width: 720px) {
+  .footer__vat {
+    display: block;
+    margin: 8px 0 0;
+    padding-left: 0;
+    border-left: 0;
+  }
+}
 .footer__cols { display: contents; }
 .footer__col { display: flex; flex-direction: column; gap: 12px; }
 .footer__h { margin: 0 0 8px; font-size: 15px; font-weight: 600; color: var(--ink); }
@@ -2098,19 +2130,19 @@ button { font: inherit; cursor: pointer; }
   z-index: 90;
   width: 56px; height: 56px;
   border-radius: 50%;
-  background: #25D366;
+  background: #000000;
   color: #ffffff;
   display: inline-flex; align-items: center; justify-content: center;
-  box-shadow: 0 10px 30px rgba(37, 211, 102, 0.35), 0 4px 10px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 4px 10px rgba(0, 0, 0, 0.25);
   transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
   animation: whatsapp-bob 3.2s ease-in-out infinite;
 }
 .whatsapp-fab:hover {
   transform: translateY(-3px) scale(1.06);
-  box-shadow: 0 16px 38px rgba(37, 211, 102, 0.5), 0 4px 12px rgba(0,0,0,0.25);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.3);
   animation-play-state: paused;
 }
-.whatsapp-fab:focus-visible { outline: 2px solid #25D366; outline-offset: 3px; }
+.whatsapp-fab:focus-visible { outline: 2px solid #000000; outline-offset: 3px; }
 
 /* Icon sits above the pulse rings via z-index. */
 .whatsapp-fab__icon {
@@ -2127,7 +2159,7 @@ button { font: inherit; cursor: pointer; }
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: #25D366;
+  background: #000000;
   opacity: 0.55;
   z-index: 1;
   animation: whatsapp-pulse 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
@@ -3971,9 +4003,7 @@ button { font: inherit; cursor: pointer; }
 }
 .cred__inner { max-width: var(--shell); margin: 0 auto; padding: 0 var(--gutter); }
 .cred__head {
-  display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between;
-  gap: 24px;
-  margin: 0 0 clamp(64px, 10vh, 112px);
+  margin: 0 0 clamp(48px, 8vh, 88px);
 }
 .cred__title {
   margin: 0;
@@ -3981,8 +4011,7 @@ button { font: inherit; cursor: pointer; }
   line-height: 1.15; letter-spacing: -0.02em;
   font-weight: 600;
   color: var(--ink);
-  flex: 1;
-  min-width: 300px;
+  max-width: 720px;
 }
 .cred__iso {
   display: inline-flex; align-items: center; gap: 14px;
@@ -4014,67 +4043,76 @@ button { font: inherit; cursor: pointer; }
   margin-top: 2px;
 }
 
-.cred__grid {
+/* Horizontal auto-scrolling logo marquee. The .cred__track holds the
+   full set of logos duplicated back-to-back and translates by -50% over
+   40s in a linear loop — the transition wraps seamlessly because the
+   second half is a visual copy of the first. Soft fade masks on both
+   sides so logos slide in/out of view instead of hard-cutting. Widths:
+   desktop cells target ~16.6% (≈6 visible), tablet ~25% (~4), phone
+   ~40% (~2.5 visible). */
+.cred__marquee {
+  position: relative;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+}
+.cred__track {
   list-style: none;
   margin: 0; padding: 0;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  border-top: 1px solid var(--line);
-  border-left: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: max-content;
+  animation: cred-scroll 42s linear infinite;
+  will-change: transform;
+}
+.cred__marquee:hover .cred__track { animation-play-state: paused; }
+@keyframes cred-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 .cred__cell {
-  position: relative;
+  flex: 0 0 auto;
+  width: clamp(140px, 16vw, 220px);
+  height: clamp(80px, 9vw, 120px);
   display: flex; align-items: center; justify-content: center;
-  aspect-ratio: 16 / 9;
-  padding: clamp(20px, 3vw, 48px);
+  padding: 0 clamp(20px, 2.5vw, 40px);
   border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  transition: background 0.2s var(--ease);
 }
-/* Plus-shaped 5-dot cluster at every grid intersection. Each cell
-   overlays a ::before that extends 6px beyond its bounds and paints a
-   12×12 SVG cluster (center dot + 4 around) at each of its four
-   corners. Adjacent cells' clusters overlap exactly, so shared corners
-   still render as a single cluster. */
-.cred__cell::before {
-  content: '';
-  position: absolute;
-  inset: -6px;
-  pointer-events: none;
-  background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12'><circle cx='6' cy='6' r='1.3' fill='%23141414'/><circle cx='2' cy='6' r='1.3' fill='%23141414'/><circle cx='10' cy='6' r='1.3' fill='%23141414'/><circle cx='6' cy='2' r='1.3' fill='%23141414'/><circle cx='6' cy='10' r='1.3' fill='%23141414'/></svg>"),
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12'><circle cx='6' cy='6' r='1.3' fill='%23141414'/><circle cx='2' cy='6' r='1.3' fill='%23141414'/><circle cx='10' cy='6' r='1.3' fill='%23141414'/><circle cx='6' cy='2' r='1.3' fill='%23141414'/><circle cx='6' cy='10' r='1.3' fill='%23141414'/></svg>"),
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12'><circle cx='6' cy='6' r='1.3' fill='%23141414'/><circle cx='2' cy='6' r='1.3' fill='%23141414'/><circle cx='10' cy='6' r='1.3' fill='%23141414'/><circle cx='6' cy='2' r='1.3' fill='%23141414'/><circle cx='6' cy='10' r='1.3' fill='%23141414'/></svg>"),
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12'><circle cx='6' cy='6' r='1.3' fill='%23141414'/><circle cx='2' cy='6' r='1.3' fill='%23141414'/><circle cx='10' cy='6' r='1.3' fill='%23141414'/><circle cx='6' cy='2' r='1.3' fill='%23141414'/><circle cx='6' cy='10' r='1.3' fill='%23141414'/></svg>");
-  background-position: 0 0, 100% 0, 0 100%, 100% 100%;
-  background-repeat: no-repeat;
-  background-size: 12px 12px;
-}
-.cred__cell:hover { background: rgba(0,0,0,0.02); }
 .cred__cell img {
-  max-width: clamp(50px, 6vw, 90px);
-  max-height: clamp(20px, 2.4vw, 34px);
+  max-width: clamp(80px, 8vw, 130px);
+  max-height: clamp(28px, 3vw, 44px);
   width: auto; height: auto;
   object-fit: contain;
-  filter: grayscale(1) contrast(1.5) brightness(0.9);
-  mix-blend-mode: multiply;
-  opacity: 0.9;
+  filter: grayscale(1) contrast(1.1) brightness(0.9);
+  opacity: 0.75;
   transition: filter 0.25s var(--ease), opacity 0.25s var(--ease);
 }
-.cred__cell:hover img {
+.cred__marquee:hover .cred__cell img {
   filter: none;
-  mix-blend-mode: normal;
   opacity: 1;
 }
 
-@media (max-width: 1100px) {
-  .cred__grid { grid-template-columns: repeat(4, 1fr); }
-}
-@media (max-width: 720px) {
-  .cred__grid { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 900px) {
+  .cred__track { animation-duration: 30s; }
+  .cred__cell {
+    width: clamp(120px, 28vw, 180px);
+    height: 80px;
+    padding: 0 clamp(16px, 3vw, 24px);
+  }
+  .cred__cell img { max-width: 100px; max-height: 34px; }
 }
 @media (max-width: 480px) {
-  .cred__grid { grid-template-columns: repeat(2, 1fr); }
+  .cred__track { animation-duration: 22s; }
+  .cred__cell {
+    width: 40vw;
+    height: 72px;
+    padding: 0 14px;
+  }
+  .cred__cell img { max-width: 90px; max-height: 30px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cred__track { animation: none; }
 }
 
 /* ------------------ FINAL CTA — new copy needs .btn styles ------------------ */
@@ -4291,7 +4329,7 @@ button { font: inherit; cursor: pointer; }
   list-style: none; padding: 0;
   margin: 0 0 clamp(40px, 6vh, 64px);
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 1px;
   background: var(--line);
   border: 1px solid var(--line);
@@ -4723,13 +4761,8 @@ button { font: inherit; cursor: pointer; }
   .partners__cell-logo { max-width: 120px; max-height: 60px; }
   .partners__sub, .partners__body { font-size: 14px; }
 
-  /* CREDIBILITY — cell aspect ratio + smaller logos */
-  .cred__cell { aspect-ratio: 4 / 3; padding: 14px; }
-  .cred__cell img { max-width: 72px; max-height: 26px; }
-  .cred__iso { padding: 8px 12px 8px 10px; gap: 10px; }
-  .cred__iso-badge { height: 36px; }
-  .cred__iso-text-strong { font-size: 12px; }
-  .cred__iso-text-sub { font-size: 10px; }
+  /* CREDIBILITY marquee sizing lives with the base marquee rules;
+     ISO badge was removed from Credibility.tsx (no longer rendered). */
 
   /* FINAL CTA — full-width tap targets on very narrow screens */
   .final__cta-row { flex-direction: column; align-items: stretch; gap: 12px; }

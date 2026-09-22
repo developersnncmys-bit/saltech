@@ -22,30 +22,27 @@ const orgs = [
 ];
 
 export default function Credibility() {
+  // Duplicate the list so the CSS marquee can translate -50% and loop
+  // seamlessly (the second half is a visual copy of the first).
+  const marquee = [...orgs, ...orgs];
+
   return (
     <section className="cred" id="credibility">
       <div className="cred__inner">
         <div className="cred__head">
-          <p className="section-eyebrow">Credibility</p>
           <h2 className="cred__title">Organisations we have supported.</h2>
-          <span className="cred__iso" aria-label="ISO 9001:2015 certified quality management system">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logos/ISO.png" alt="" className="cred__iso-badge" loading="lazy" />
-            <span className="cred__iso-text">
-              <span className="cred__iso-text-strong">ISO 9001:2015</span>
-              <span className="cred__iso-text-sub">Certified Quality Management System</span>
-            </span>
-          </span>
         </div>
 
-        <ul className="cred__grid" aria-label="Client organisations">
-          {orgs.map((o) => (
-            <li className="cred__cell" key={o.slug}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`/logos/${o.slug}.png`} alt={o.name} loading="lazy" />
-            </li>
-          ))}
-        </ul>
+        <div className="cred__marquee" aria-label="Client organisations">
+          <ul className="cred__track" aria-hidden="true">
+            {marquee.map((o, i) => (
+              <li className="cred__cell" key={`${o.slug}-${i}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={`/logos/${o.slug}.png`} alt={o.name} loading="lazy" />
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );

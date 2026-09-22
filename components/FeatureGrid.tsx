@@ -83,7 +83,7 @@ export default function FeatureGrid() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               className="saltech-cinematic-canvas__img"
-              src="/images/new-mosaic-mimic.jpg"
+              src="/images/Mosiac-highlight.jpg"
               alt=""
               
             />

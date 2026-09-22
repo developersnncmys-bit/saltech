@@ -12,6 +12,7 @@ const partners = [
   { name: "Thinking Space", slug: "thinking-space", logo: "/logos/thinkingspace.png" },
   { name: "Ambetronics",    slug: "ambetronics",    logo: "/logos/ambetronics.png" },
   { name: "Kleev Mek",      slug: "kleev-mek",      logo: "/logos/kleev.png" },
+  { name: "Hitech",         slug: "hitech",         logo: "/logos/hitech.png" },
 ];
 
 export default function Partners() {

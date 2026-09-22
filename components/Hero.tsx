@@ -2,13 +2,15 @@ export default function Hero() {
   return (
     <header id="top" className="hero">
       <div className="hero__bg" aria-hidden="true">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <video
           className="hero__img"
-          src="/images/hero-banner-section.png"
-          alt=""
-          loading="eager"
-          decoding="async"
+          src="/videos/hero.mp4"
+          poster="/images/hero-banner-section.png"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
         />
         <div className="hero__vignette" />
       </div>
@@ -22,7 +24,7 @@ export default function Hero() {
               for Critical Industrial Environments<span className="hero__title-dot">.</span>
             </h1>
             <p className="hero__sub-body">
-              We design and manufacture mosaic mimic panels, control room systems,
+              We specialise in mosaic mimic panels, control room systems,
               hazardous-area solutions and specialist industrial packages for
               demanding industrial environments.
             </p>

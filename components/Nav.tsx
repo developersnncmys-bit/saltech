@@ -61,24 +61,6 @@ const SOCIAL = [
       </svg>
     ),
   },
-  {
-    label: "YouTube",
-    href: "#",
-    svg: (
-      <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
-        <path d="M23 12s0-3.6-.46-5.32a2.78 2.78 0 0 0-1.96-1.97C18.85 4.25 12 4.25 12 4.25s-6.85 0-8.58.46A2.78 2.78 0 0 0 1.46 6.68C1 8.4 1 12 1 12s0 3.6.46 5.32a2.78 2.78 0 0 0 1.96 1.97c1.73.46 8.58.46 8.58.46s6.85 0 8.58-.46a2.78 2.78 0 0 0 1.96-1.97C23 15.6 23 12 23 12zM9.75 15.27V8.73L15.5 12l-5.75 3.27z" />
-      </svg>
-    ),
-  },
-  {
-    label: "X",
-    href: "#",
-    svg: (
-      <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true">
-        <path d="M18.244 2H21.5l-7.53 8.61L23 22h-6.94l-5.44-6.9L4.4 22H1.14l8.06-9.22L1 2h7.13l4.92 6.28L18.244 2zm-2.44 18h1.9L7.32 4H5.28l10.524 16z" />
-      </svg>
-    ),
-  },
 ];
 
 export default function Nav() {
