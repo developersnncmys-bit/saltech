@@ -1,7 +1,8 @@
 "use client";
 
-// TODO: set the WhatsApp number (country code + number, no "+" or spaces) to enable the FAB.
-const WHATSAPP_NUMBER = "";
+// Country code + number, no "+" or spaces (matches the utility-bar
+// contact: +44 (0) 7542 699 546 → 447542699546).
+const WHATSAPP_NUMBER = "447542699546";
 const PREFILL =
   "Hi Saltech, I'd like to discuss a panel / system requirement.";
 

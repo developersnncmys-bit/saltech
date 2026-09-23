@@ -13,7 +13,9 @@ export default function Footer() {
             UK-based engineering partner delivering safety-critical control and industrial systems.
           </p>
           <p className="footer__cert">
-            ISO 9001:2015 Certified <span aria-hidden="true">|</span> Certificate No. 27167-QMS-001
+            <span className="footer__cert-part">ISO 9001:2015 Certified</span>
+            <span className="footer__cert-sep" aria-hidden="true">|</span>
+            <span className="footer__cert-part">Certificate No. 27167-QMS-001</span>
           </p>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -81,7 +83,7 @@ export default function Footer() {
 
       <div className="footer__bottom">
         <p className="footer__copy">
-          Saltech Consulting Ltd | Registered in England &amp; Wales (Company No. 14906407) | Registered Office: 1 The Bluebells, Shaftesbury, SP7 8GW, United Kingdom. <span className="footer__vat">VAT No: GB510069923</span>
+          © Saltech Consulting Ltd | Registered in England &amp; Wales (Company No. 14906407) | Registered Office: 1 The Bluebells, Shaftesbury, SP7 8GW, UK | VAT No: GB510069923
         </p>
         <p className="footer__credit">
           Developed by{" "}

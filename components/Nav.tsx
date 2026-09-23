@@ -93,10 +93,6 @@ export default function Nav() {
           doesn't waste vertical space once the user is reading content. */}
       <div className={`nav-util${scrolled ? " nav-util--hidden" : ""}`}>
         <div className="nav-util__inner">
-          <a href="#top" className="nav-util__logo" aria-label="Saltech home" onClick={close}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="Saltech" />
-          </a>
           <div className="nav-util__contact">
             <a href="tel:+447542699546" className="nav-util__link">
               <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">

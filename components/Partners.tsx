@@ -8,11 +8,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 // can be dropped into /public/partner-logos/ later and the render swapped
 // to <img> — the text-plate fallback below keeps the section shipping now.
 const partners = [
-  { name: "Werner",         slug: "werner",         logo: "/logos/werner.png" },
-  { name: "Thinking Space", slug: "thinking-space", logo: "/logos/thinkingspace.png" },
-  { name: "Ambetronics",    slug: "ambetronics",    logo: "/logos/ambetronics.png" },
-  { name: "Kleev Mek",      slug: "kleev-mek",      logo: "/logos/kleev.png" },
-  { name: "Hitech",         slug: "hitech",         logo: "/logos/hitech.png" },
+  { name: "Werner",         slug: "werner",         logo: "/logos/werner.png",        url: "https://wernerelektrik.com/" },
+  { name: "Thinking Space", slug: "thinking-space", logo: "/logos/thinkingspace.png", url: "https://thinking-space.com/" },
+  { name: "Ambetronics",    slug: "ambetronics",    logo: "/logos/ambetronics.png",   url: "https://ambetronics.com/" },
+  { name: "Kleev Mek",      slug: "kleev-mek",      logo: "/logos/kleev.png",         url: "https://kleevme.ae/" },
+  { name: "Hitech",         slug: "hitech",         logo: "/logos/hitech.png",        url: "https://hitechsoln.com/" },
 ];
 
 export default function Partners() {
@@ -101,13 +101,21 @@ export default function Partners() {
         <ul className="partners__grid" aria-label="Technology and manufacturing partners">
           {partners.map((p) => (
             <li className="partners__cell" key={p.slug}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                className="partners__cell-logo"
-                src={p.logo}
-                alt={p.name}
-                loading="lazy"
-              />
+              <a
+                href={p.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Visit ${p.name} website`}
+                className="partners__cell-link"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  className="partners__cell-logo"
+                  src={p.logo}
+                  alt={p.name}
+                  loading="lazy"
+                />
+              </a>
             </li>
           ))}
         </ul>

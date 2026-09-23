@@ -72,6 +72,14 @@ export default function FeatureGrid() {
             </p>
           </div>
 
+          {/* Subtle scroll cue in the runway space at the bottom of the
+              pinned viewport. Signals that scrolling reveals more (image
+              expansion) instead of the empty band reading as dead space. */}
+          <div className="features__scroll-cue" aria-hidden="true">
+            <span className="features__scroll-cue-label">Scroll</span>
+            <span className="features__scroll-cue-line" />
+          </div>
+
           <div className="saltech-cinematic-canvas saltech-cinematic-static-image" aria-hidden="true">
             {/* SwitchShowcase mounted with renderCanvas=false — orchestration
                 only. The mosaic image lives HERE (outside the hero text
