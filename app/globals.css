@@ -1388,6 +1388,16 @@ button { font: inherit; cursor: pointer; }
   }
 }
 
+/* 1300–1500px range — 1vw only reaches ~14px, so the base rule
+   floors the description at 14px and it reads as tiny copy on a
+   full-width desktop nav. Bump to ~17px in this range. */
+@media (min-width: 1300px) and (max-width: 1500px) {
+  .saltech-cinematic-section .features__intro-para {
+    font-size: clamp(16px, 1.25vw, 18px);
+    line-height: 1.6;
+  }
+}
+
 .saltech-cinematic-section .saltech-cinematic-canvas canvas {
   display: block;
   touch-action: none;
